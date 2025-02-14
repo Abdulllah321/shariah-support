@@ -1,7 +1,7 @@
 "use client"
 import {useRecord} from "@/context/RecordContext";
 
-import XLSX from "xlsx";
+import * as XLSX from 'xlsx';
 import {format} from "date-fns";
 import {deleteDoc} from "@firebase/firestore";
 import {doc} from "firebase/firestore";

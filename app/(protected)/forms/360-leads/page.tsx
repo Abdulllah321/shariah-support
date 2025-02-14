@@ -32,8 +32,9 @@ const Page = () => {
             };
             setFormData(updatedFormData)
         }
-    }, [user]);
+    }, [user, formData]);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleChange = (key: string, value: any) => {
         if (key === "branchCode") {
             const branch = branches.find((branch) => branch.branchCode === value);

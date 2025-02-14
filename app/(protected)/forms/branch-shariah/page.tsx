@@ -24,6 +24,7 @@ const Page = () => {
     const [saving, setSaving] = useState(false);
     const router = useRouter();
     const {branches} = useRecord();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [questions, setQuestions] = useState<any[]>([]);
     const [questionLoading, setQuestionLoading] = useState<boolean>(false);
     const [uniqueId] = useState(() => Date.now().toString());
@@ -63,7 +64,7 @@ const Page = () => {
             const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
             const drafts = existingDrafts ? JSON.parse(existingDrafts) : [];
 
-            // Find draft using either existing `id` or `uniqueId`
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const draft = drafts.find((draft: any) => draft.id === uniqueId);
             if (draft) {
                 setFormData(draft.formData);
@@ -73,7 +74,7 @@ const Page = () => {
         fetchDraft();
     }, [uniqueId]);
 
-    // Handle form change and auto-save
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleChange = (key: string, value: any) => {
         const updatedForm = {...formData, [key]: value};
 
@@ -106,6 +107,7 @@ const Page = () => {
         setSaving(true);
         try {
             const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const drafts: any[] = existingDrafts ? JSON.parse(existingDrafts) : [];
 
             const draftIndex = drafts.findIndex((draft) => draft.id === uniqueId);
@@ -149,6 +151,7 @@ const Page = () => {
 
             const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
             if (existingDrafts) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const drafts = JSON.parse(existingDrafts).filter((draft: any) => draft.id !== uniqueId);
                 localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
             }

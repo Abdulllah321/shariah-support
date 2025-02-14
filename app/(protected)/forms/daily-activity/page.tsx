@@ -42,13 +42,13 @@ const Page = () => {
             setFormData({} as dailyActivityType); // ✅ نیا انٹری فارم ریڈی کریں
         }
     }, [id, fetchDailyActivityById]);
-
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleChange = (key: string, value: any) => {
         if (key === "branchCode") {
 
             const branch = branches.find((branch) => branch.branchCode === value);
             if (branch) {
-                //@ts-ignore
+                //@ts-expect-error:@typescript-eslint/ ban-ts-comment
                 setFormData((prev) => ({
                     ...prev, // Ensure previous state is preserved
                     branchCode: branch.branchCode,

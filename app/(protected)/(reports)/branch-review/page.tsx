@@ -1,6 +1,6 @@
 "use client"
 import {useRecord} from "@/context/RecordContext";
-import XLSX from "xlsx";
+import * as XLSX from 'xlsx';
 import {format} from "date-fns";
 import {deleteDoc} from "@firebase/firestore";
 import {collection, doc, getDocs, orderBy, query} from "firebase/firestore";
@@ -26,6 +26,7 @@ export default function DailyActivityReport() {
     const {branchShariahRecords, branchShariahLoading, fetchBranchShariah} = useRecord();
     const router = useRouter();
     const [questions, setQuestions] = useState<Question[]>()
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [drafts, setDrafts] = useState<any[]>([]);
 
 
@@ -71,6 +72,7 @@ export default function DailyActivityReport() {
         try {
 
             const formattedData = branchShariahRecords.map((record: branchShariahTypes) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const rowData: any = { // 👈 Define rowData as an indexable object
                     "Sharia Scholar": record.name || "N/A",
                     "Branch Code": record.branchCode || "N/A",
@@ -121,6 +123,7 @@ export default function DailyActivityReport() {
 
     const handleDeleteDraft = (id: string) => {
         try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const updatedDrafts = drafts?.filter((draft: any) => draft.id !== id);
             setDrafts(updatedDrafts);
 

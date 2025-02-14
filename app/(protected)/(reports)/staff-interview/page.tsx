@@ -1,6 +1,6 @@
 "use client"
 import {useRecord} from "@/context/RecordContext";
-import XLSX from "xlsx";
+import * as XLSX from 'xlsx';
 import {format} from "date-fns";
 import {deleteDoc} from "@firebase/firestore";
 import {collection, doc, getDocs, orderBy, query} from "firebase/firestore";
@@ -22,10 +22,18 @@ import {CardHeader} from "@heroui/card";
 
 const DRAFT_STORAGE_KEY = "cachedStaffReviews";
 
+
+interface RowDataType {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any; // Adjust 'any' to a more specific type if possible
+}
+
+
 export default function DailyActivityReport() {
-    const {staffInterviewRecords, staffInterviewLoading, fetchStaffInterview , } = useRecord();
+    const {staffInterviewRecords, staffInterviewLoading, fetchStaffInterview,} = useRecord();
     const router = useRouter();
     const [questions, setQuestions] = useState<Question[]>()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [drafts, setDrafts] = useState<any[]>([]);
 
 
@@ -71,7 +79,7 @@ export default function DailyActivityReport() {
         try {
 
             const formattedData = staffInterviewRecords.map((record: branchShariahTypes) => {
-                const rowData = {
+                const rowData:RowDataType  = {
                     "Sharia Scholar": record.name || "N/A",
                     "Branch Code": record.branchCode || "N/A",
                     "Branch City": record.city || "N/A",
@@ -88,10 +96,8 @@ export default function DailyActivityReport() {
 
                 questions?.forEach((question: { question: string }) => {
                     if (record[question.question]) {
-                        //@ts-ignore
                         rowData[question.question] = record[question.question];
                     } else {
-                        //@ts-ignore
                         rowData[question.question] = "N/A"; // Default value if the key does not exist in the record
                     }
                 });
@@ -131,7 +137,7 @@ export default function DailyActivityReport() {
 
     const handleDeleteDraft = (id: string) => {
         try {
-            // @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
             const updatedDrafts = drafts?.filter((draft: any) => draft.id !== id);
             setDrafts(updatedDrafts);
 
