@@ -3,19 +3,96 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Background Colors (Light Mode) */
+  --background: 220 40% 95%; /* Soft Off-White */
+  --background-muted: 220 30% 90%; /* Light Misty Blue */
+  --background-hover: 220 25% 85%; /* Muted Soft Gray */
+  --background-active: 220 20% 75%; /* Neutral Gray */
+
+  /* Foreground Colors (Light Mode) */
+  --foreground: 240 60% 20%; /* Deep Navy Blue */
+  --foreground-muted: 220 15% 35%; /* Soft Steel Blue-Gray */
+  --foreground-hover: 220 20% 25%; /* Darker Blue-Gray */
+  --foreground-active: 220 100% 15%; /* Strong Banking Blue */
+
+  /* Primary Colors (Light Mode) */
+  --primary: 220 100% 20%; /* Classic Banking Blue */
+  --primary-hover: 220 100% 15%; /* Darker Banking Blue */
+  --primary-active: 220 100% 10%; /* Even Darker Banking Blue */
+
+  /* Secondary Colors (Light Mode) */
+  --secondary: 40 90% 50%;      /* Rich Amber */
+  --secondary-hover: 40 90% 45%;  /* Slightly Darker Amber */
+  --secondary-active: 40 90% 40%; /* Even Darker Amber */
+
+  /* Muted Colors */
+  --muted: 220 40% 90%; /* Light Muted Blue */
+  --muted-foreground: 220 10% 45%; /* Medium Gray-Blue */
+
+  /* Border Colors */
+  --border: 220 15% 65%; /* Neutral Gray */
+  --border-hover: 220 20% 50%; /* Warmer Neutral Gray */
+
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  /* Background Colors (Dark Mode) */
+  --background: 220.85deg 33.05% 6.62%; /* Dark Charcoal */
+  --background-muted: 220 30% 15%; /* Muted Dark Gray-Blue */
+  --background-hover: 220 25% 20%; /* Softer Charcoal */
+  --background-active: 220 20% 25%; /* Slightly Brighter Gray */
+
+  /* Foreground Colors (Dark Mode) */
+  --foreground: 0 0% 100%; /* White */
+  --foreground-muted: 220 15% 55%; /* Soft Faded Blue */
+  --foreground-hover: 220 20% 65%; /* Gentle Grayish Blue */
+  --foreground-active: 220 30% 75%; /* Light Cloudy Gray */
+
+  /* Primary Colors (Dark Mode) */
+  --primary: 220 100% 25%; /* Deep Blue */
+  --primary-hover: 220 100% 20%; /* Darker Blue */
+  --primary-active: 220 100% 15%; /* Even Darker Blue */
+
+  /* Secondary Colors (Dark Mode) */
+  --secondary: 50 100% 50%; /* Warm Gold */
+  --secondary-hover: 50 90% 45%; /* Darker Gold */
+  --secondary-active: 50 80% 40%; /* Even Darker Gold */
+
+  /* Muted Colors */
+  --muted: 220 40% 15%; /* Muted Dark Gray-Blue */
+  --muted-foreground: 220 20% 40%; /* Soft Blue-Gray */
+
+  /* Border Colors */
+  --border: 220 15% 35%; /* Softened Border */
+  --border-hover: 220 20% 50%; /* Cool Neutral Gray */
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+html, body {
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+  font-family: "Inter", sans-serif;
+  width: 100vw;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+  border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted));
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--background-hover));
 }
