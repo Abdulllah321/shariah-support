@@ -103,7 +103,7 @@ const CommonList: React.FC<CommonListProps> = ({
                             >
                                 <div className="flex justify-between items-center w-full">
                                     <div>
-                                        <p className="text-gray-900 dark:text-gray-100">{renderItemContent(item)}</p>
+                                        <p className="text-gray-900 dark:text-gray-100 text-left">{renderItemContent(item)}</p>
                                         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                         <p className="text-gray-500 dark:text-gray-400 text-sm text-left">{(item as any)[description] ?? "N/A"}</p>
                                     </div>
