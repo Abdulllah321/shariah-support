@@ -10,8 +10,8 @@ import {
     Autocomplete,
     AutocompleteItem
 } from "@heroui/react";
-import {parseAbsolute} from "@internationalized/date";
-import {Divider} from "@heroui/divider";
+import { parseAbsolute } from "@internationalized/date";
+import { Divider } from "@heroui/divider";
 
 export interface FormField {
     value?: string;
@@ -34,13 +34,13 @@ interface FormGeneratorProps {
 }
 
 const FormGenerator: React.FC<FormGeneratorProps> = ({
-                                                         fields,
-                                                         onChange,
-                                                         values,
-                                                         handleSubmit,
-                                                         submitText = "Submit",
-                                                         submitLoading,
-                                                     }) => {
+    fields,
+    onChange,
+    values,
+    handleSubmit,
+    submitText = "Submit",
+    submitLoading,
+}) => {
     const FormComponent = handleSubmit ? "form" : "div";
 
 
@@ -116,12 +116,9 @@ const FormGenerator: React.FC<FormGeneratorProps> = ({
                             <DatePicker
                                 isRequired={field.required}
                                 label={field.label}
-                                //@ts-ignore
-                                value={
-                                    values[field.value!]
-                                        ? parseAbsolute(values[field.value!], "UTC") // Ensuring it's a valid DateValue
-                                        : undefined
-                                }
+                                // @ts-expect-error
+                                value={values[field.value!] ? parseAbsolute(values[field.value!], "UTC") : undefined}
+
                                 onChange={(date: DateValue | null) =>
                                     onChange(field.value!, date ? date.toString() : "")
                                 }
@@ -136,7 +133,7 @@ const FormGenerator: React.FC<FormGeneratorProps> = ({
                                 className="w-full"
                             />
                         ) : field.type === "divider" ? (
-                            <Divider/>
+                            <Divider />
                         ) : (
                             <Input
                                 id={field.value}
