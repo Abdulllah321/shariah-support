@@ -116,7 +116,7 @@ const FormGenerator: React.FC<FormGeneratorProps> = ({
                             <DatePicker
                                 isRequired={field.required}
                                 label={field.label}
-                                // @ts-expect-error
+                                // @ts-expect-error: `parseAbsolute` may return a value incompatible with DatePicker's `value` type.
                                 value={values[field.value!] ? parseAbsolute(values[field.value!], "UTC") : undefined}
 
                                 onChange={(date: DateValue | null) =>
