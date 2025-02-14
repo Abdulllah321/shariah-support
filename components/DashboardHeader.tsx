@@ -7,7 +7,6 @@ import {Modal, ModalBody, ModalContent, ModalFooter, ModalHeader} from "@heroui/
 import Image from "next/image";
 import {Skeleton} from "@heroui/skeleton";
 import {Divider} from "@heroui/divider";
-import {useTheme} from "@heroui/use-theme";
 
 interface DashboardHeaderProps {
     username?: string;
@@ -27,7 +26,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                                                          }) => {
     const [visible, setVisible] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
-    const [isEmpIdVisible, setIsEmpIdVisible] = useState(false); // State to toggle visibility
+    const [isEmpIdVisible, setIsEmpIdVisible] = useState(false); 
 
     const openLogoutModal = () => setVisible(true);
     const closeLogoutModal = () => setVisible(false);

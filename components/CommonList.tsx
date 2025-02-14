@@ -1,15 +1,15 @@
 'use client';
 
-import React, {useState} from 'react';
-import {Card, Listbox, ListboxItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader} from '@heroui/react';
-import {Button} from "@heroui/button";
-import {useRouter} from 'next/navigation';
-import {dailyActivityType} from "@/types/dailyactivityTypes";
-import {EmployeeData as branchShariahTypes} from "@/types/branchShariahTypes";
-import {EmployeeData as staffInterviewTypes} from "@/types/staffInterviewTypes";
-import {leadsType} from "@/types/360LeadsTypes";
-import {Pencil, Trash2, RefreshCcw, PlusCircle, ClipboardList, UsersRound, CheckCircle} from "lucide-react";
-import {Skeleton} from "@heroui/skeleton";
+import React, { useState } from 'react';
+import { Card, Listbox, ListboxItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react';
+import { Button } from "@heroui/button";
+import { useRouter } from 'next/navigation';
+import { dailyActivityType } from "@/types/dailyactivityTypes";
+import { EmployeeData as branchShariahTypes } from "@/types/branchShariahTypes";
+import { EmployeeData as staffInterviewTypes } from "@/types/staffInterviewTypes";
+import { leadsType } from "@/types/360LeadsTypes";
+import { Pencil, Trash2, RefreshCcw, PlusCircle } from "lucide-react";
+import { Skeleton } from "@heroui/skeleton";
 
 interface Action {
     label: string;
@@ -30,16 +30,16 @@ interface CommonListProps {
 }
 
 const CommonList: React.FC<CommonListProps> = ({
-                                                   loading = false,
-                                                   records,
-                                                   confirmDelete,
-                                                   fetchRecords,
-                                                   noRecordsText = 'No records available',
-                                                   noRecordsActions = [],
-                                                   renderItemContent,
-                                                   description = 'branchName',
-                                                   action,
-                                               }) => {
+    loading = false,
+    records,
+    confirmDelete,
+    fetchRecords,
+    noRecordsText = 'No records available',
+    noRecordsActions = [],
+    renderItemContent,
+    description = 'branchName',
+    action,
+}) => {
     const router = useRouter();
     const [deleteModal, setDeleteModal] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -71,12 +71,12 @@ const CommonList: React.FC<CommonListProps> = ({
                     >
                         <div className="flex justify-between items-center w-full">
                             <div>
-                                <Skeleton className="h-6 w-40 mb-2"/>
-                                <Skeleton className="h-4 w-32"/>
+                                <Skeleton className="h-6 w-40 mb-2" />
+                                <Skeleton className="h-4 w-32" />
                             </div>
                             <div className="flex space-x-2">
-                                <div className="h-8 w-8 bg-gray-300 dark:bg-gray-700 rounded-full animate-pulse"/>
-                                <div className="h-8 w-8 bg-gray-300 dark:bg-gray-700 rounded-full animate-pulse"/>
+                                <div className="h-8 w-8 bg-gray-300 dark:bg-gray-700 rounded-full animate-pulse" />
+                                <div className="h-8 w-8 bg-gray-300 dark:bg-gray-700 rounded-full animate-pulse" />
                             </div>
                         </div>
                     </div>
@@ -97,13 +97,14 @@ const CommonList: React.FC<CommonListProps> = ({
                             className={`w-full`}
                         >
                             <Card isPressable
-                                  onPress={() => router.push(`/detail/${item.id}?action=${action}`)}
-                                  fullWidth
-                                  className="p-3 rounded-md transition bg-transparent w-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                                onPress={() => router.push(`/detail/${item.id}?action=${action}`)}
+                                fullWidth
+                                className="p-3 rounded-md transition bg-transparent w-full hover:bg-gray-100 dark:hover:bg-gray-800"
                             >
                                 <div className="flex justify-between items-center w-full">
                                     <div>
                                         <p className="text-gray-900 dark:text-gray-100">{renderItemContent(item)}</p>
+                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                         <p className="text-gray-500 dark:text-gray-400 text-sm text-left">{(item as any)[description] ?? "N/A"}</p>
                                     </div>
                                     <div className="flex space-x-2">
@@ -118,7 +119,7 @@ const CommonList: React.FC<CommonListProps> = ({
                                             className={'shadow-foreground !shadow-md mr-1'}
                                             color={"warning"}
                                         >
-                                            <Pencil size={16}/>
+                                            <Pencil size={16} />
                                         </Button>
                                         <Button
                                             onClick={(e) => {
@@ -131,7 +132,7 @@ const CommonList: React.FC<CommonListProps> = ({
                                             className={'shadow-foreground !shadow-md'}
                                             color={"danger"}
                                         >
-                                            <Trash2 size={16}/>
+                                            <Trash2 size={16} />
                                         </Button>
                                     </div>
                                 </div>
@@ -150,7 +151,7 @@ const CommonList: React.FC<CommonListProps> = ({
                             radius={'lg'}
                             fullWidth
                             variant={'shadow'}
-                            startContent={<PlusCircle/>}
+                            startContent={<PlusCircle />}
                             onClick={action.onPress}
                             size={'lg'}
                         >
@@ -164,7 +165,7 @@ const CommonList: React.FC<CommonListProps> = ({
                         fullWidth
                         variant={'light'}
                         className={`mt-4`}
-                        startContent={<RefreshCcw size={16} className="mr-2"/>}
+                        startContent={<RefreshCcw size={16} className="mr-2" />}
                         onClick={fetchRecords}
                     >
                         Refresh

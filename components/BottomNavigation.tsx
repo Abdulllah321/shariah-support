@@ -4,7 +4,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ClipboardList, CheckCircle, Users, Pencil } from "lucide-react";
 import { cn } from "@heroui/react";
-import {Ripple} from "@heroui/ripple";
 import ButtonsModal from "@/components/ButtonsModal";
 
 const routes = [

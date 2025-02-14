@@ -26,6 +26,7 @@ export interface FormField {
 interface FormGeneratorProps {
     fields: FormField[];
     onChange: (field: string, value: string) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     values: Record<string, any>;
     handleSubmit?: (values: Record<string, string>) => void;
     submitText?: string;
