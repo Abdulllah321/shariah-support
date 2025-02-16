@@ -10,8 +10,8 @@ import {
     Autocomplete,
     AutocompleteItem
 } from "@heroui/react";
-import { parseAbsolute } from "@internationalized/date";
-import { Divider } from "@heroui/divider";
+import {parseDate} from "@internationalized/date";
+import {Divider} from "@heroui/divider";
 
 export interface FormField {
     value?: string;
@@ -34,13 +34,13 @@ interface FormGeneratorProps {
 }
 
 const FormGenerator: React.FC<FormGeneratorProps> = ({
-    fields,
-    onChange,
-    values,
-    handleSubmit,
-    submitText = "Submit",
-    submitLoading,
-}) => {
+                                                         fields,
+                                                         onChange,
+                                                         values,
+                                                         handleSubmit,
+                                                         submitText = "Submit",
+                                                         submitLoading,
+                                                     }) => {
     const FormComponent = handleSubmit ? "form" : "div";
 
 
@@ -90,7 +90,8 @@ const FormGenerator: React.FC<FormGeneratorProps> = ({
                                     {(field.options ?? [])
                                         .filter((option) => option) // ✅ Remove falsy values
                                         .map((option, index) => (
-                                            <AutocompleteItem key={`options__${option}-${index}`} value={`options__${option}-${index}`} textValue={option}>
+                                            <AutocompleteItem key={`options__${option}-${index}`}
+                                                              value={`options__${option}-${index}`} textValue={option}>
                                                 {option}
                                             </AutocompleteItem>
                                         ))}
@@ -113,40 +114,49 @@ const FormGenerator: React.FC<FormGeneratorProps> = ({
                                 </Select>
                             )
                         ) : field.type === "date" ? (
-                            <DatePicker
-                                isRequired={field.required}
-                                label={field.label}
-                                // @ts-expect-error: `parseAbsolute` may return a value incompatible with DatePicker's `value` type.
-                                value={values[field.value!] ? parseAbsolute(values[field.value!], "UTC") : undefined}
 
-                                onChange={(date: DateValue | null) =>
-                                    onChange(field.value!, date ? date.toString() : "")
-                                }
-                            />
-                        ) : field.type === "textarea" ? (
-                            <Textarea
-                                id={field.value}
-                                label={field.label}
-                                isRequired={field.required}
-                                value={values[field.value!] ?? ""}
-                                onChange={(e) => onChange(field.value!, e.target.value)}
-                                className="w-full"
-                            />
-                        ) : field.type === "divider" ? (
-                            <Divider />
-                        ) : (
-                            <Input
-                                id={field.value}
-                                label={field.label}
-                                type={field.type === "numeric" ? "number" : field.type}
-                                isRequired={field.required}
-                                value={values[field.value!] ?? ""}
-                                onChange={(e) => onChange(field.value!, e.target.value)}
-                                className="w-full"
-                            />
-                        )}
+                                <DatePicker
+                                    isRequired={field.required}
+                                    label={field.label}
+                                    // @ts-expect-error:@typescript-eslint/ ban-ts-comment
+                                    value={
+                                        values[field.value!]
+                                            ? parseDate(values[field.value!]) // Convert string to DateValue
+                                            : undefined
+                                    }
+                                    onChange={(date: DateValue | null) =>
+                                        onChange(field.value!, date ? date.toString() : "")
+                                    }
+                                />
+
+                            )
+                            :
+                            field.type === "textarea" ? (
+                                <Textarea
+                                    id={field.value}
+                                    label={field.label}
+                                    isRequired={field.required}
+                                    value={values[field.value!] ?? ""}
+                                    onChange={(e) => onChange(field.value!, e.target.value)}
+                                    className="w-full"
+                                />
+                            ) : field.type === "divider" ? (
+                                <Divider/>
+                            ) : (
+                                <Input
+                                    id={field.value}
+                                    label={field.label}
+                                    type={field.type === "numeric" ? "number" : field.type}
+                                    isRequired={field.required}
+                                    value={values[field.value!] ?? ""}
+                                    onChange={(e) => onChange(field.value!, e.target.value)}
+                                    className="w-full"
+                                />
+                            )
+                        }
                     </div>
-                );
+                )
+                    ;
             })}
 
             {/* Submit Button */}

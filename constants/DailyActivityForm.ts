@@ -43,7 +43,7 @@ export const fetchBranches = async (): Promise<{ codes: string[]; names: string[
 const fetchActivities = async (): Promise<ActivityType[]> => {
     try {
         const snapshot = await getDocs(query(collection(db, "activities")));
-        return snapshot.docs.map((doc) => doc.data().name);
+        return snapshot.docs.map((doc) => doc.data() as ActivityType);
     } catch (error) {
         console.error("Error fetching activities:", error);
         return [];

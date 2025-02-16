@@ -15,6 +15,7 @@
     "@heroui/theme": "^2.4.6",
     "@heroui/use-theme": "^2.1.2",
     "@internationalized/date": "^3.7.0",
+    "@react-aria/i18n": "^3.12.5",
     "date-fns": "^4.1.0",
     "firebase": "^11.3.1",
     "framer-motion": "^12.4.2",
