@@ -18,13 +18,12 @@ const Layout = ({children}: { children: ReactNode }) => {
         return sum + (isNaN(score) ? 0 : score);
     }, 0);
     return (
-        <div>
+        <div className={`w-full md:w-1/2 mx-auto`}>
             <DashboardHeader handleLogout={logout} handleScoreDetails={handleScoreDetails} empId={user?.employeeId}
                              username={user?.username} score={totalScore}/>
-            <div className={`w-full md:w-1/2`}>
 
-                {children}
-            </div>
+
+            {children}
         </div>
     );
 };
