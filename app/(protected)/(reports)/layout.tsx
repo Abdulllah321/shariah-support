@@ -21,7 +21,10 @@ const Layout = ({children}: { children: ReactNode }) => {
         <div>
             <DashboardHeader handleLogout={logout} handleScoreDetails={handleScoreDetails} empId={user?.employeeId}
                              username={user?.username} score={totalScore}/>
-            {children}
+            <div className={`w-full md:w-1/2`}>
+
+                {children}
+            </div>
         </div>
     );
 };
