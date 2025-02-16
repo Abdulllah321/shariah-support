@@ -17,7 +17,6 @@ const RecordsList = () => {
         );
     }
 
-    console.log(dailyActivityRecords);
 
     const totalScore = dailyActivityRecords.reduce((sum, record) => {
         const score = typeof record.score === "string" ? parseInt(record.score, 10) : record.score;
@@ -35,7 +34,7 @@ const RecordsList = () => {
     };
 
     return (
-        <div className="p-6 min-h-screen">
+        <div className="p-6 min-h-screen w-full md:w-1/2 mx-auto">
             {dailyActivityRecords.length > 0 ? (
                 dailyActivityRecords.map((record) => (
                     <Card key={record.id} className="mb-4 w-full relative" isPressable onPress={()=> router.push(`/detail/${record.id}?action=daily-activity`)}>

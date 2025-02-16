@@ -83,7 +83,7 @@ const DetailsPage = () => {
     if (loading) return <LoadingSkeleton/>;
 
     return (
-        <div className="min-h-screen p-6">
+        <div className="min-h-screen p-6 w-full md:w-1/2 mx-auto" >
             {/* Breadcrumbs */}
             <Breadcrumbs>
                 <BreadcrumbItem href="/" startContent={<Home className="w-4 h-4"/>}>
