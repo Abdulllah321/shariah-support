@@ -2,7 +2,6 @@
 import {useRecord} from "@/context/RecordContext";
 
 import * as XLSX from 'xlsx';
-import {format} from "date-fns";
 import {deleteDoc} from "@firebase/firestore";
 import {doc} from "firebase/firestore";
 import {db} from "@/lib/firebase";
@@ -64,13 +63,13 @@ export default function DailyActivityReport() {
 
     // Render function
     const renderItemContent = (item: dailyActivityType | branchShariahTypes | staffInterviewTypes | leadsType) => {
-        if ("date" in item && "activity" in item) {
+        if ("bmDomainId" in item && "clientName" in item) {
             return (
                 <div className="flex items-center space-x-2">
                     <span
-                        className="base font-medium text-foreground-600">{format(new Date(item.date), "yyyy-MM-dd")}</span>
-                    {item.activity ? (
-                        <span className="text-gray-600">{`- ${item.activity}`}</span>
+                        className="base font-medium text-foreground-600">{item.bmDomainId}</span>
+                    {item.clientName ? (
+                        <span className="text-gray-600">{`- ${item.clientName}`}</span>
                     ) : (
                         <span className="text-red-500">- No activity</span>
                     )}
@@ -80,6 +79,7 @@ export default function DailyActivityReport() {
 
         return <span className="text-gray-500">Unknown Record Type</span>;
     };
+
     return (
         <ScrollShadow>
             <div className="flex flex-row items-center justify-between p-2.5">

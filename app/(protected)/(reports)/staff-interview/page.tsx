@@ -18,6 +18,7 @@ import {Divider} from "@heroui/divider";
 import {useEffect, useState} from "react";
 import {Question} from "@/components/QuestionsList";
 import {CardHeader} from "@heroui/card";
+import {getFormattedDate} from "@/constants";
 
 
 const DRAFT_STORAGE_KEY = "cachedStaffReviews";
@@ -86,7 +87,7 @@ export default function DailyActivityReport() {
                     Province: record.province || "N/A",
                     "Branch Region": record.region || "N/A",
                     "Visit Date": record.visitDate
-                        ? format(new Date(record.visitDate), "yyyy-MM-dd") // Ensure correct format
+                        ? format(new Date(record.visitDate), "yyyy-MMM-dd") // Ensure correct format
                         : "N/A", "Staff Name": record.staffName,
                     Designation: record.designation,
                     "Employee Number": record.employeeName,
@@ -156,7 +157,7 @@ export default function DailyActivityReport() {
             return (
                 <div className="flex items-center space-x-2">
                     <span
-                        className="text-base font-medium text-foreground-600">{format(new Date(item.visitDate!), "yyyy-MM-dd")}</span>
+                        className="text-base font-medium text-foreground-600">{getFormattedDate(item.visitDate!)}</span>
                     {item.staffName ? (
                         <span className="text-gray-600">{`- ${item.staffName}`}</span>
                     ) : (

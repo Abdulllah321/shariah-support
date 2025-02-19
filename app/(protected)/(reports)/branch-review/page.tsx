@@ -18,6 +18,7 @@ import {Divider} from "@heroui/divider";
 import {useEffect, useState} from "react";
 import {Question} from "@/components/QuestionsList";
 import {CardHeader} from "@heroui/card";
+import {getFormattedDate} from "@/constants";
 
 
 const DRAFT_STORAGE_KEY = "cachedBranchShariahReviews";
@@ -142,7 +143,7 @@ export default function DailyActivityReport() {
             return (
                 <div className="flex items-center space-x-2">
                     <span
-                        className="text-base font-medium text-foreground-600">{format(new Date(item.visitDate!), "yyyy-MM-dd")}</span>
+                        className="text-base font-medium text-foreground-600">{getFormattedDate(item.visitDate!)}</span>
                     {item.branchCode ? (
                         <span className="text-gray-600">{`- ${item.branchCode}`}</span>
                     ) : (

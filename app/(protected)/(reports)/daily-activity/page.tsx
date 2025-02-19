@@ -2,7 +2,7 @@
 import {useRecord} from "@/context/RecordContext";
 
 import * as XLSX from 'xlsx';
-import {format} from "date-fns";
+import { format } from "date-fns";
 import {deleteDoc} from "@firebase/firestore";
 import {doc} from "firebase/firestore";
 import {db} from "@/lib/firebase";
@@ -16,6 +16,7 @@ import {EmployeeData as staffInterviewTypes} from "@/types/staffInterviewTypes";
 import {leadsType} from "@/types/360LeadsTypes"
 import {useRouter} from "next/navigation";
 import {Divider} from "@heroui/divider";
+import {getFormattedDate} from "@/constants";
 
 export default function DailyActivityReport() {
     const {dailyActivityRecords, dailyActivityLoading, fetchDailyActivity} = useRecord();
@@ -25,7 +26,7 @@ export default function DailyActivityReport() {
         try {
             const formattedData = dailyActivityRecords.map((record) => ({
                 "Sharia Scholar": record.name || "N/A",
-                Date: format(new Date(record.date), "yyyy-MM-dd"),
+                Date: format(new Date(record.date), "yyyy-MMM-dd"),
                 Day: new Date(record.date).toLocaleDateString("en-US", {weekday: "long"}),
                 Duration: record.duration || "N/A",
                 "Branch Code": record.branchCode || "N/A",
@@ -76,8 +77,9 @@ export default function DailyActivityReport() {
         if ("date" in item && "activity" in item) {
             return (
                 <div className="flex items-center space-x-2">
-                    <span
-                        className="base font-medium text-foreground-600">{format(new Date(item.date), "yyyy-MM-dd")}</span>
+            <span className="base font-medium text-foreground-600">
+                {getFormattedDate(item.date)}
+        </span>
                     {item.activity ? (
                         <span className="text-gray-600">{`- ${item.activity}`}</span>
                     ) : (
@@ -86,9 +88,10 @@ export default function DailyActivityReport() {
                 </div>
             );
         }
-
         return <span className="text-gray-500">Unknown Record Type</span>;
     };
+
+
     return (
         <ScrollShadow>
             <div className="flex flex-row items-center justify-between p-2.5">
