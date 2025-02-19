@@ -1,36 +1,30 @@
-import { format, isToday, isYesterday } from "date-fns";
+import { format, isToday, isYesterday, isTomorrow, differenceInCalendarDays } from "date-fns";
 
-export const getFormattedDate = (dateStr: string | number): string => {
-    const recordDate = new Date(dateStr);
-    const today = new Date();
+export const getFormattedDate = (dateInput: string | number | Date): string => {
+    const date = new Date(dateInput);
+    const now = new Date();
 
-    if (isToday(recordDate)) {
+    if (isToday(date)) {
         return "Today";
-    } else if (isYesterday(recordDate)) {
-        return "Yesterday";
-    } else {
-        // Check if the record is from last month.
-        const recordMonth = recordDate.getMonth();
-        const recordYear = recordDate.getFullYear();
-        const todayMonth = today.getMonth();
-        const todayYear = today.getFullYear();
-
-        let isRecordInLastMonth = false;
-
-        if (todayYear === recordYear) {
-            // If current month is greater by 1 than record month.
-            if (todayMonth - recordMonth === 1) {
-                isRecordInLastMonth = true;
-            }
-        } else if (todayYear - recordYear === 1 && todayMonth === 0 && recordMonth === 11) {
-            // Special edge-case: today is January and record is December of previous year.
-            isRecordInLastMonth = true;
-        }
-
-        if (isRecordInLastMonth) {
-            return "Last Month";
-        } else {
-            return format(recordDate, "dd-MMM-yyyy");
-        }
     }
+    if (isYesterday(date)) {
+        return "Yesterday";
+    }
+    if (isTomorrow(date)) {
+        return "Tomorrow";
+    }
+
+    // If the date is within the same week (past or upcoming), show the day name (e.g., "Monday")
+    const diffDays = differenceInCalendarDays(date, now);
+    if (diffDays >= -6 && diffDays <= 6) {
+        return format(date, "EEEE");
+    }
+
+    // If the date is within the current year, show "dd-MMM" (e.g., "20-Feb")
+    if (date.getFullYear() === now.getFullYear()) {
+        return format(date, "dd-MMM");
+    }
+
+    // Otherwise, show full date "dd-MMM-yyyy" (e.g., "20-Feb-2025")
+    return format(date, "dd-MMM-yyyy");
 };

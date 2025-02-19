@@ -1,8 +1,7 @@
-"use client"
+"use client";
 import {useRecord} from "@/context/RecordContext";
-
-import * as XLSX from 'xlsx';
-import { format } from "date-fns";
+import * as XLSX from "xlsx";
+import {format} from "date-fns";
 import {deleteDoc} from "@firebase/firestore";
 import {doc} from "firebase/firestore";
 import {db} from "@/lib/firebase";
@@ -13,14 +12,32 @@ import {Download} from "lucide-react";
 import CommonList from "@/components/CommonList";
 import {EmployeeData as branchShariahTypes} from "@/types/branchShariahTypes";
 import {EmployeeData as staffInterviewTypes} from "@/types/staffInterviewTypes";
-import {leadsType} from "@/types/360LeadsTypes"
+import {leadsType} from "@/types/360LeadsTypes";
 import {useRouter} from "next/navigation";
 import {Divider} from "@heroui/divider";
 import {getFormattedDate} from "@/constants";
+import {Accordion, AccordionItem} from "@heroui/react";
+
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const groupRecordsByMonth = (records: any[]) => {
+    return records.reduce((groups, record) => {
+        const date = new Date(record.date);
+        // Use "yyyy-MM" as a key (e.g., "2025-01")
+        const monthKey = format(date, "yyyy-MM");
+        if (!groups[monthKey]) {
+            groups[monthKey] = [];
+        }
+        groups[monthKey].push(record);
+        return groups;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }, {} as Record<string, any[]>);
+};
 
 export default function DailyActivityReport() {
     const {dailyActivityRecords, dailyActivityLoading, fetchDailyActivity} = useRecord();
-    const router = useRouter()
+    const router = useRouter();
+
     // Export function
     const handleExportToExcel = () => {
         try {
@@ -52,7 +69,9 @@ export default function DailyActivityReport() {
             XLSX.utils.book_append_sheet(wb, ws, "Daily Activity Report");
 
             const excelBuffer = XLSX.write(wb, {bookType: "xlsx", type: "array"});
-            const blob = new Blob([excelBuffer], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+            const blob = new Blob([excelBuffer], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            });
 
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
@@ -72,14 +91,16 @@ export default function DailyActivityReport() {
         fetchDailyActivity();
     };
 
-    // Render function
-    const renderItemContent = (item: dailyActivityType | branchShariahTypes | staffInterviewTypes | leadsType) => {
+    // Render function for an individual record
+    const renderItemContent = (
+        item: dailyActivityType | branchShariahTypes | staffInterviewTypes | leadsType
+    ) => {
         if ("date" in item && "activity" in item) {
             return (
                 <div className="flex items-center space-x-2">
-            <span className="base font-medium text-foreground-600">
-                {getFormattedDate(item.date)}
-        </span>
+          <span className="base font-medium text-foreground-600">
+            {getFormattedDate(item.date)}
+          </span>
                     {item.activity ? (
                         <span className="text-gray-600">{`- ${item.activity}`}</span>
                     ) : (
@@ -91,16 +112,22 @@ export default function DailyActivityReport() {
         return <span className="text-gray-500">Unknown Record Type</span>;
     };
 
+    // Group records by month
+    const groupedRecords = groupRecordsByMonth(dailyActivityRecords);
+    // Sort month keys in descending order (latest first)
+    const sortedMonthKeys = Object.keys(groupedRecords).sort(
+        (a, b) => new Date(`${b}-01`).getTime() - new Date(`${a}-01`).getTime()
+    );
 
     return (
         <ScrollShadow>
             <div className="flex flex-row items-center justify-between p-2.5">
-                <h2 className={`text-2xl font-extrabold`}>Daily Activity Report</h2>
+                <h2 className="text-2xl font-extrabold">Daily Activity Report</h2>
                 <Button
                     onPress={handleExportToExcel}
                     isIconOnly
-                    color={'warning'}
-                    radius={'full'}
+                    color={"warning"}
+                    radius={"full"}
                     variant={`faded`}
                     className="shadow-secondary"
                 >
@@ -109,22 +136,43 @@ export default function DailyActivityReport() {
             </div>
             <Divider/>
 
-            <CommonList
-                records={dailyActivityRecords}
-                confirmDelete={confirmDelete}
-                fetchRecords={fetchDailyActivity}
-                renderItemContent={renderItemContent}
-                action="daily-activity"
-                noRecordsActions={
-                    [
-                        {
-                            label: "Add Daily Activity Record",
-                            onPress: () => router.push("/forms/daily-activity"),
-                        },
-                    ]}
-                loading={dailyActivityLoading}
-            />
+            {sortedMonthKeys.length > 0 ? (
+                <Accordion selectionMode={'multiple'} defaultExpandedKeys={'all'}>
+                    {sortedMonthKeys.map((monthKey) => {
+                        const dateObj = new Date(`${monthKey}-01`);
+                        const monthLabel = format(dateObj, "MMMM yyyy");
+                        return (
+                            <AccordionItem
+                                key={monthKey}
+                                title={monthLabel}
+                                classNames={
+                                    {
+                                        title: "text-xl font-extrabold text-secondary px-4 shadow-white drop-shadow-xl"
+                                    }
+                                }
 
+                            >
+                                <CommonList
+                                    records={groupedRecords[monthKey]}
+                                    confirmDelete={confirmDelete}
+                                    fetchRecords={fetchDailyActivity}
+                                    renderItemContent={renderItemContent}
+                                    action="daily-activity"
+                                    noRecordsActions={[
+                                        {
+                                            label: "Add Daily Activity Record",
+                                            onPress: () => router.push("/forms/daily-activity"),
+                                        },
+                                    ]}
+                                    loading={dailyActivityLoading}
+                                />
+                            </AccordionItem>
+                        );
+                    })}
+                </Accordion>
+            ) : (
+                <p className="p-4 text-center">No records found.</p>
+            )}
         </ScrollShadow>
     );
 }
