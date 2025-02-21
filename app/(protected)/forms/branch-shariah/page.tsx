@@ -156,7 +156,7 @@ const Page = () => {
                 localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
             }
 
-            router.push("/branch-shariah");
+            router.push("/branch-review");
         } catch (error) {
             console.error("Error saving data:", error);
         } finally {
