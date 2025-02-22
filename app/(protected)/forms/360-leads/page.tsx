@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useEffect, useState} from "react";
+import React, { useState} from "react";
 import use360LeadsFormFields from "@/constants/360LeadsForm";
 import FormGenerator from "@/components/FormGenerator";
 import {useRouter} from "next/navigation";
