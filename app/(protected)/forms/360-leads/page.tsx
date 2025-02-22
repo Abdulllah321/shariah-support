@@ -7,7 +7,6 @@ import {useRouter} from "next/navigation";
 import {addDoc, setDoc} from "@firebase/firestore";
 import {collection, doc} from "firebase/firestore";
 import {db} from "@/lib/firebase";
-import {useRecord} from "@/context/RecordContext";
 import {leadsType} from "@/types/360LeadsTypes";
 import {Card, CardBody, CardHeader} from "@heroui/card";
 import {ArrowLeft} from "lucide-react";
@@ -19,53 +18,29 @@ const Page = () => {
     const [formData, setFormData] = useState<leadsType>({} as leadsType);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
-    const {branches} = useRecord();
     const {user} = useAuth();
-
-    useEffect(() => {
-        if (user) {
-
-            const updatedFormData = {
-                ...formData,
-                creatorId: user?.employeeId,
-                creator_name: user?.username,
-            };
-            setFormData(updatedFormData)
-        }
-    }, [user, formData]);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleChange = (key: string, value: any) => {
-        if (key === "branchCode") {
-            const branch = branches.find((branch) => branch.branchCode === value);
-            if (branch) {
-                setFormData((prev) => ({
-                    ...prev,
-                    branchCode: branch.branchCode,
-                    branchName: branch.branchName,
-                    city: branch.city,
-                    area: branch.area,
-                    rgm: branch.rgmName,
-                    region: branch.region,
-                }));
-            }
-        } else {
             setFormData((prev) => ({...prev, [key]: value}));
-        }
     };
 
     const handleSave = async () => {
         try {
             setLoading(true);
 
-
+            const updatedFormData = {
+                ...formData,
+                creatorId: user?.employeeId,
+                creator_name: user?.username,
+            };
             if (formData.id) {
-                await setDoc(doc(db, "360Leads", formData.id), formData);
+                await setDoc(doc(db, "360Leads", formData.id), updatedFormData);
             } else {
-                await addDoc(collection(db, "360Leads"), formData);
+                await addDoc(collection(db, "360Leads"), updatedFormData);
             }
 
-            router.push("/");
+            router.push("/leads");
         } catch (error) {
             console.error("Error saving data:", error);
         } finally {

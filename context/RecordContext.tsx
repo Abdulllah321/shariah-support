@@ -1,4 +1,4 @@
-import {createContext, useContext, useEffect, useState} from "react";
+import React, {createContext, useContext, useEffect, useState} from "react";
 import {collection, getDocs, query, where, orderBy, doc, getDoc} from "firebase/firestore";
 import {db} from "@/lib/firebase";
 import {Branch, dailyActivityType} from "@/types/dailyactivityTypes";
@@ -155,9 +155,8 @@ export const RecordProvider = ({children}: { children: React.ReactNode }) => {
             const recordsQuery = query(
                 collection(db, "360Leads"),
                 where("creatorId", "==", user?.employeeId),
-                orderBy("createdAt", "desc")
             );
-            ;
+
             const querySnapshot = await getDocs(recordsQuery);
             const records: leadsType[] = querySnapshot.docs.map((doc) => ({
                 id: doc.id,
@@ -186,12 +185,11 @@ export const RecordProvider = ({children}: { children: React.ReactNode }) => {
     };
 
     useEffect(() => {
-        fetchBranches().then(() => {
-            fetchDailyActivity();
-            fetchBranchShariah();
-            fetchStaffInterview();
-            fetchLeads();
-        });
+        fetchBranches()
+        fetchDailyActivity();
+        fetchBranchShariah();
+        fetchStaffInterview();
+        fetchLeads();
     }, []);
 
     return (
