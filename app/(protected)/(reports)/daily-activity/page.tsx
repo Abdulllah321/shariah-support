@@ -23,7 +23,6 @@ import {Accordion, AccordionItem} from "@heroui/react";
 const groupRecordsByMonth = (records: any[]) => {
     return records.reduce((groups, record) => {
         const date = new Date(record.date);
-        // Use "yyyy-MM" as a key (e.g., "2025-01")
         const monthKey = format(date, "yyyy-MM");
         if (!groups[monthKey]) {
             groups[monthKey] = [];

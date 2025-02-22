@@ -17,7 +17,6 @@ import {Skeleton} from "@heroui/skeleton"; // ✅ Skeleton component for loading
 const Page = () => {
     const formFields = useDailyActivityFormFields();
     const [formData, setFormData] = useState<dailyActivityType | null>(null);
-
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(false); // ✅ Track data fetching
     const router = useRouter();
@@ -42,6 +41,7 @@ const Page = () => {
             setFormData({} as dailyActivityType); // ✅ نیا انٹری فارم ریڈی کریں
         }
     }, [id, fetchDailyActivityById]);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleChange = (key: string, value: any) => {
         if (key === "branchCode") {

@@ -14,6 +14,7 @@ import {Divider} from "@heroui/divider";
 import QuestionsList from "@/components/QuestionsList";
 import {EmployeeData} from "@/types/branchShariahTypes";
 import {Button} from "@heroui/button";
+import {useAuth} from "@/context/AuthContext";
 
 const DRAFT_STORAGE_KEY = "cachedBranchShariahReviews";
 
@@ -28,6 +29,7 @@ const Page = () => {
     const [questions, setQuestions] = useState<any[]>([]);
     const [questionLoading, setQuestionLoading] = useState<boolean>(false);
     const [uniqueId] = useState(() => Date.now().toString());
+    const {user} = useAuth();
 
     let autoSaveTimeout: NodeJS.Timeout | null = null;
 
@@ -143,10 +145,16 @@ const Page = () => {
         try {
             setLoading(true);
 
+            const updatedFormData = {
+                ...formData,
+                employeeId: user?.employeeId,
+                name: user?.username,
+            }
+
             if (id) {
-                await setDoc(doc(db, "BranchReview", id), formData);
+                await setDoc(doc(db, "BranchReview", id), updatedFormData);
             } else {
-                await addDoc(collection(db, "BranchReview"), formData);
+                await addDoc(collection(db, "BranchReview"), updatedFormData);
             }
 
             const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
