@@ -105,8 +105,8 @@ const useDailyActivityFormFields = () => {
             options: branchNames,
             loading: branchLoading,
         },
-        {value: "personMet", label: "Person Met", type: "text", required: true},
-        {value: "designation", label: "Designation", type: "dropdown", options: designation, required: true},
+        {value: "personMet", label: "Person Met", type: "text", required: false},
+        {value: "designation", label: "Designation", type: "dropdown", options: designation, required: false},
         {
             value: "activity",
             label: "Activity / Title",
@@ -123,7 +123,7 @@ const useDailyActivityFormFields = () => {
             options: distanceOptions,
             required: true
         },
-        {value: "contact", label: "Contact #", type: "numeric", required: true},
+        {value: "contact", label: "Contact #", type: "numeric", required: false},
         {value: "otherVenue", label: "Other Venue", type: "text", required: false},
         {value: "city", label: "City", type: "text", required: true},
         {value: "area", label: "Area", type: "text", required: true},
