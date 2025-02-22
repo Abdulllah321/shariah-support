@@ -3,7 +3,7 @@ import {useRecord} from "@/context/RecordContext";
 import * as XLSX from 'xlsx';
 import {format} from "date-fns";
 import {deleteDoc} from "@firebase/firestore";
-import {collection, doc, getDocs, orderBy, query} from "firebase/firestore";
+import {collection, doc, getDocs,  query} from "firebase/firestore";
 import {db} from "@/lib/firebase";
 import {ScrollShadow} from "@heroui/scroll-shadow";
 import {dailyActivityType} from "@/types/dailyactivityTypes";
