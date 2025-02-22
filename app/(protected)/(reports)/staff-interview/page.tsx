@@ -49,6 +49,7 @@ export default function DailyActivityReport() {
 
     useEffect(() => {
         fetchDraft();
+        fetchStaffInterview()
     }, []);
 
 

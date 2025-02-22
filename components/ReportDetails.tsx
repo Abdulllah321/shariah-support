@@ -1,15 +1,15 @@
 "use client";
 
-import {useSearchParams} from "next/navigation";
-import React, {JSX, useEffect, useState} from "react";
-import {doc, getDoc} from "firebase/firestore";
-import {db} from "@/lib/firebase";
+import { useSearchParams } from "next/navigation";
+import React, { JSX, useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import getDailyActivityList from "./DailyActivityList";
 import getBranchReviewList from "./BranchReviewList";
 import getStaffInterviewList from "./StaffInterviewList";
 import get360LeadsList from "./360LeadsList";
-import {Card, CardHeader, Spinner} from "@heroui/react";
-import {CardBody} from "@heroui/card";
+import { Card, CardHeader, Spinner, Skeleton } from "@heroui/react";
+import { CardBody } from "@heroui/card";
 
 interface ReportDetailsProps {
     id: string;
@@ -20,14 +20,14 @@ interface DetailItemProps {
     value: string | number | { label: string; value: string | number }[];
     icon?: JSX.Element;
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 const actionMap: Record<string, (id: string) => Promise<any>> = {
     "daily-activity": async (id) => getDoc(doc(db, "records", id)),
     "branch-review": async (id) => getDoc(doc(db, "BranchReview", id)),
     "staff-interview": async (id) => getDoc(doc(db, "StaffReview", id)),
-    "360-leads": async (id) => getDoc(doc(db, "360Leads", id)),
+    "leads": async (id) => getDoc(doc(db, "360Leads", id)),
 };
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 const getReportList = async (action: string, data: any) => {
     switch (action) {
         case "daily-activity":
@@ -36,25 +36,27 @@ const getReportList = async (action: string, data: any) => {
             return await getBranchReviewList(data);
         case "staff-interview":
             return await getStaffInterviewList(data);
-        case "360-leads":
+        case "leads":
             return get360LeadsList(data);
         default:
             return [];
     }
 };
 
-const ReportDetails: React.FC<ReportDetailsProps> = ({id}) => {
+const ReportDetails: React.FC<ReportDetailsProps> = ({ id }) => {
     const searchParams = useSearchParams();
-    const action = searchParams.get("action") || "";
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const actionParam = searchParams.get("action");
+
+    const action = actionParam === "branch-shariah" ? "branch-review" : actionParam;
+
     const [report, setReport] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [reportList, setReportList] = useState<DetailItemProps[]>([]);
 
     useEffect(() => {
-        if (!id || !actionMap[action]) return setLoading(false);
+        if (!id || !actionMap[action!]) return setLoading(false);
 
-        actionMap[action](id)
+        actionMap[action!](id)
             .then((docSnap) => {
                 if (docSnap.exists()) {
                     setReport(docSnap.data());
@@ -66,10 +68,21 @@ const ReportDetails: React.FC<ReportDetailsProps> = ({id}) => {
 
     useEffect(() => {
         if (!report) return;
-        getReportList(action, report).then(setReportList);
+        getReportList(action!, report).then(setReportList);
     }, [action, report]);
 
-    if (loading) return <Spinner/>;
+    if (loading) {
+        return (
+            <div className="space-y-6">
+                <div className="grid lg:grid-cols-2 gap-4">
+                    {Array.from({ length: 6 }).map((_, index) => (
+                        <SkeletonLoader key={index} />
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
     if (!report) return <p className="text-center text-gray-500 dark:text-gray-400">No report found.</p>;
 
     return (
@@ -83,12 +96,11 @@ const ReportDetails: React.FC<ReportDetailsProps> = ({id}) => {
     );
 };
 
-const DetailItem: React.FC<DetailItemProps> = ({label, value, icon}) => {
+const DetailItem: React.FC<DetailItemProps> = ({ label, value, icon }) => {
     const isArray = Array.isArray(value);
 
     return (
-        <Card
-            className={`border-l-4 border-secondary dark:border-accent-dark shadow-md dark:bg-gray-800 dark:text-gray-300 ${isArray ? "col-span-2" : ""}`}>
+        <Card className={`border-l-4 border-secondary dark:border-accent-dark shadow-md dark:bg-gray-800 dark:text-gray-300 ${isArray ? "col-span-2" : "    "}`}>
             <CardHeader>
                 {icon}
                 <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 ml-2">{label}</h3>
@@ -98,11 +110,8 @@ const DetailItem: React.FC<DetailItemProps> = ({label, value, icon}) => {
                     {isArray ? (
                         <ul className="mt-2 space-y-2">
                             {value.map((q, i) => (
-                                <li key={i}
-                                    className="p-3 border rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700">
-                                    <h2  content={`#${i + 1}`}>
-                                        Question #{i + 1}
-                                    </h2>
+                                <li key={i} className="p-3 border rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700">
+                                    <h2 content={`#${i + 1}`}>Question #{i + 1}</h2>
                                     <p className="text-gray-600 dark:text-gray-400 mt-2">{q.label}</p>
                                     <p className="text-lg font-medium text-gray-800 dark:text-gray-100">{q.value}</p>
                                 </li>
@@ -116,5 +125,18 @@ const DetailItem: React.FC<DetailItemProps> = ({label, value, icon}) => {
         </Card>
     );
 };
+
+// Skeleton Loader Component
+const SkeletonLoader: React.FC = () => (
+    <Card className="border-l-4 border-gray-300 dark:border-gray-700 shadow-md dark:bg-gray-800 dark:text-gray-300">
+        <CardHeader>
+            <Skeleton className="w-1/2 h-5" />
+        </CardHeader>
+        <CardBody>
+            <Skeleton className="w-full h-4 mb-2" />
+            <Skeleton className="w-3/4 h-4" />
+        </CardBody>
+    </Card>
+);
 
 export default ReportDetails;

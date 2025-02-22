@@ -41,7 +41,7 @@ export default function DailyActivityReport() {
     };
 
     useEffect(() => {
-        fetchDraft();
+        fetchDraft();fetchBranchShariah()
     }, []);
 
 

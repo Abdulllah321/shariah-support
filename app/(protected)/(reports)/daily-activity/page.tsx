@@ -17,6 +17,7 @@ import {useRouter} from "next/navigation";
 import {Divider} from "@heroui/divider";
 import {getFormattedDate} from "@/constants";
 import {Accordion, AccordionItem} from "@heroui/react";
+import {useEffect} from "react";
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,6 +37,10 @@ const groupRecordsByMonth = (records: any[]) => {
 export default function DailyActivityReport() {
     const {dailyActivityRecords, dailyActivityLoading, fetchDailyActivity} = useRecord();
     const router = useRouter();
+
+    useEffect(() => {
+        fetchDailyActivity()
+    }, []);
 
     // Export function
     const handleExportToExcel = () => {

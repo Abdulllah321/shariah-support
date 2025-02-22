@@ -15,10 +15,15 @@ import {EmployeeData as staffInterviewTypes} from "@/types/staffInterviewTypes";
 import {leadsType} from "@/types/360LeadsTypes"
 import {useRouter} from "next/navigation";
 import {Divider} from "@heroui/divider";
+import {useEffect} from "react";
 
 export default function DailyActivityReport() {
     const {LeadsRecords, LeadsLoading, fetchLeads} = useRecord();
     const router = useRouter()
+
+    useEffect(() => {
+        fetchLeads()
+    }, []);
 
     const handleExportToExcel = () => {
         try {
