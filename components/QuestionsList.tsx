@@ -6,6 +6,7 @@ import {Input,   Spinner, Divider} from '@heroui/react';
 export interface Question {
     id: string;
     question: string;
+    name: string;
 
     [key: string]: string;
 }

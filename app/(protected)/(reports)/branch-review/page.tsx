@@ -88,7 +88,6 @@ export default function DailyActivityReport() {
                 questions?.forEach((question: Question) => {
                     rowData[question.name] = record[question.name] || "N/A";
                 });
-
                 return rowData;
             });
 
