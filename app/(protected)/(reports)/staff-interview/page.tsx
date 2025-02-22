@@ -55,8 +55,7 @@ export default function DailyActivityReport() {
     const fetchQuestions = async () => {
         try {
             const questionQuery = query(
-                collection(db, "branches-review-points"),
-                orderBy("order") // Order by the "order" field
+                collection(db, "sQuestion")
             );
             const questionSnapshot = await getDocs(questionQuery);
 
@@ -95,11 +94,11 @@ export default function DailyActivityReport() {
                 };
 
 
-                questions?.forEach((question: { name: string }) => {
-                    if (record[question.name]) {
-                        rowData[question.name] = record[question.name];
+                questions?.forEach((question: { question: string }) => {
+                    if (record[question.question]) {
+                        rowData[question.question] = record[question.question];
                     } else {
-                        rowData[question.name] = "N/A"; // Default value if the key does not exist in the record
+                        rowData[question.question] = "N/A"; // Default value if the key does not exist in the record
                     }
                 });
 
