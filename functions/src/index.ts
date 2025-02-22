@@ -42,18 +42,21 @@ const checkRecordsAndNotify = async (): Promise<void> => {
 };
 
 // Function to send push notifications
+// Function to send push notifications
 const sendReminderNotification = async (tokens: string[]): Promise<void> => {
     const message = {
         notification: {
             title: 'Reminder: Add Your Daily Activity!',
             body: "Don't forget to add your daily activity before the day ends.",
         },
-        tokens,
     };
 
     try {
-        await messaging.sendMulticast(message);
-        console.log('Reminder notifications sent successfully!');
+        const responses = await Promise.all(
+            tokens.map((token) => messaging.send({ ...message, token }))
+        );
+
+        console.log(`Successfully sent ${responses.length} notifications!`);
     } catch (error) {
         console.error('Error sending notifications:', error);
     }

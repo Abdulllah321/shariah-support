@@ -14,6 +14,7 @@ import {Divider} from "@heroui/divider";
 import QuestionsList from "@/components/QuestionsList";
 import {EmployeeData} from "@/types/staffInterviewTypes";
 import {Button} from "@heroui/button";
+import {useAuth} from "@/context/AuthContext";
 
 const DRAFT_STORAGE_KEY = "cachedStaffReviews";
 
@@ -27,7 +28,8 @@ const Page = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [questions, setQuestions] = useState<any[]>([]);
     const [questionLoading, setQuestionLoading] = useState<boolean>(false);
-    const [uniqueId] = useState(() => Date.now().toString()); // Generate a unique ID for new drafts
+    const [uniqueId] = useState(() => Date.now().toString());
+    const {user} = useAuth()
 
     // Fetch questions
     const fetchQuestions = async () => {
@@ -125,11 +127,15 @@ const Page = () => {
         let id;
         try {
             setLoading(true);
-
+            const updatedFormData = {
+                ...formData,
+                employeeId: user?.employeeId,
+                name: user?.username,
+            }
             if (id) {
-                await setDoc(doc(db, "StaffReview", id), formData);
+                await setDoc(doc(db, "StaffReview", id), updatedFormData);
             } else {
-                await addDoc(collection(db, "StaffReview"), formData);
+                await addDoc(collection(db, "StaffReview"), updatedFormData);
             }
 
             // Remove draft after saving
@@ -140,7 +146,7 @@ const Page = () => {
                 localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
             }
 
-            router.push("/StaffInterviewReport");
+            router.push("/staff-interview");
         } catch (error) {
             console.error("Error saving data:", error);
         } finally {
