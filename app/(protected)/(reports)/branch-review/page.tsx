@@ -7,7 +7,7 @@ import {collection, doc, getDocs, orderBy, query} from "firebase/firestore";
 import {db} from "@/lib/firebase";
 import {ScrollShadow} from "@heroui/scroll-shadow";
 import {dailyActivityType} from "@/types/dailyactivityTypes";
-import {Button, Card} from "@heroui/react";
+import {Accordion, AccordionItem, Button, Card} from "@heroui/react";
 import {Download} from "lucide-react";
 import CommonList from "@/components/CommonList";
 import {EmployeeData as branchShariahTypes} from "@/types/branchShariahTypes";
@@ -19,9 +19,24 @@ import {useEffect, useState} from "react";
 import {Question} from "@/components/QuestionsList";
 import {CardHeader} from "@heroui/card";
 import {getFormattedDate} from "@/constants";
+import ExportBottomSheet from "@/components/ExportBottomSheet";
 
 
 const DRAFT_STORAGE_KEY = "cachedBranchShariahReviews";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const groupRecordsByMonth = (records: any[]) => {
+    return records.reduce((groups, record) => {
+        const date = new Date(record.visitDate);
+        const monthKey = format(date, "yyyy-MM");
+        if (!groups[monthKey]) {
+            groups[monthKey] = [];
+        }
+        groups[monthKey].push(record);
+        return groups;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }, {} as Record<string, any[]>);
+};
 
 export default function DailyActivityReport() {
     const {branchShariahRecords, branchShariahLoading, fetchBranchShariah} = useRecord();
@@ -68,52 +83,6 @@ export default function DailyActivityReport() {
         fetchQuestions()
     }, []);
 
-    // Export function
-    const handleExportToExcel = () => {
-        try {
-
-            const formattedData = branchShariahRecords.map((record: branchShariahTypes) => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const rowData: any = { // 👈 Define rowData as an indexable object
-                    "Sharia Scholar": record.name || "N/A",
-                    "Branch Code": record.branchCode || "N/A",
-                    "Branch City": record.city || "N/A",
-                    Province: record.province || "N/A",
-                    "Branch Region": record.region || "N/A",
-                    "Visit Date": record.visitDate
-                        ? format(new Date(record.visitDate), "yyyy-MM-dd") // Ensure correct format
-                        : "N/A",
-                };
-
-                questions?.forEach((question: Question) => {
-                    rowData[question.name] = record[question.name] || "N/A";
-                });
-                return rowData;
-            });
-
-
-            if (!formattedData || formattedData.length === 0) {
-                throw new Error("No data available to export");
-            }
-
-            const ws = XLSX.utils.json_to_sheet(formattedData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Daily Activity Report");
-
-            const excelBuffer = XLSX.write(wb, {bookType: "xlsx", type: "array"});
-            const blob = new Blob([excelBuffer], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "Branch Review Report.xlsx";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } catch (error) {
-            console.error("Error exporting report:", error);
-            alert("Error: Failed to export the report.");
-        }
-    };
 
     // Delete function
     const confirmDelete = async (id: string) => {
@@ -171,6 +140,13 @@ export default function DailyActivityReport() {
 
         return <span className="text-gray-500">Unknown Record Type</span>;
     };
+
+    const groupedRecords = groupRecordsByMonth(branchShariahRecords);
+
+    const sortedMonthKeys = Object.keys(groupedRecords).sort(
+        (a, b) => new Date(`${b}-01`).getTime() - new Date(`${a}-01`).getTime()
+    );
+
     return (
         <ScrollShadow>
 
@@ -202,36 +178,48 @@ export default function DailyActivityReport() {
                     : null}
 
 
-            <div className="flex flex-row items-center justify-between p-2.5">
-                <h2 className={`text-2xl font-extrabold`}>Branch Review Report</h2>
-                <Button
-                    onPress={handleExportToExcel}
-                    isIconOnly
-                    color={'warning'}
-                    radius={'full'}
-                    variant={`faded`}
-                    className="shadow-secondary"
-                >
-                    <Download size={20}/>
-                </Button>
-            </div>
+            <ExportBottomSheet dailyActivityRecords={branchShariahRecords} action={"branch-review"} questions={questions}/>
             <Divider/>
 
-            <CommonList
-                records={branchShariahRecords}
-                confirmDelete={confirmDelete}
-                fetchRecords={fetchBranchShariah}
-                loading={branchShariahLoading}
-                renderItemContent={renderItemContent}
-                action="branch-shariah"
-                noRecordsActions={
-                    [
-                        {
-                            label: "Add Branch Review Record",
-                            onPress: () => router.push("/forms/branch-shariah"),
-                        },
-                    ]}
-            />
+            {sortedMonthKeys.length > 0 ? (
+                <Accordion selectionMode={'multiple'} defaultExpandedKeys={'all'}>
+                    {sortedMonthKeys.map((monthKey) => {
+                        const dateObj = new Date(`${monthKey}-01`);
+                        const monthLabel = format(dateObj, "MMMM yyyy");
+                        return (
+                            <AccordionItem
+                                key={monthKey}
+                                title={monthLabel}
+                                classNames={
+                                    {
+                                        title: "text-xl font-extrabold text-secondary px-4 shadow-white drop-shadow-xl"
+                                    }
+                                }
+
+                            >
+                                <CommonList
+                                    records={branchShariahRecords}
+                                    confirmDelete={confirmDelete}
+                                    fetchRecords={fetchBranchShariah}
+                                    loading={branchShariahLoading}
+                                    renderItemContent={renderItemContent}
+                                    action="branch-shariah"
+                                    noRecordsActions={
+                                        [
+                                            {
+                                                label: "Add Branch Review Record",
+                                                onPress: () => router.push("/forms/branch-shariah"),
+                                            },
+                                        ]}
+                                />
+                            </AccordionItem>
+                        );
+                    })}
+                </Accordion>
+            ) : (
+                <p className="p-4 text-center">No records found.</p>
+            )}
+
 
         </ScrollShadow>
     );

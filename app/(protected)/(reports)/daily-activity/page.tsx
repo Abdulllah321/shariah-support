@@ -81,7 +81,7 @@ export default function DailyActivityReport() {
 
     return (
         <ScrollShadow>
-         <ExportBottomSheet dailyActivityRecords={dailyActivityRecords}  />
+         <ExportBottomSheet dailyActivityRecords={dailyActivityRecords} action={'daily-activity'}  />
 
             <Divider/>
 

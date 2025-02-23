@@ -7,7 +7,7 @@ import {collection, doc, getDocs,  query} from "firebase/firestore";
 import {db} from "@/lib/firebase";
 import {ScrollShadow} from "@heroui/scroll-shadow";
 import {dailyActivityType} from "@/types/dailyactivityTypes";
-import {Button, Card} from "@heroui/react";
+import {Accordion, AccordionItem, Button, Card} from "@heroui/react";
 import {Download} from "lucide-react";
 import CommonList from "@/components/CommonList";
 import {EmployeeData as branchShariahTypes} from "@/types/branchShariahTypes";
@@ -19,6 +19,8 @@ import {useEffect, useState} from "react";
 import {Question} from "@/components/QuestionsList";
 import {CardHeader} from "@heroui/card";
 import {getFormattedDate} from "@/constants";
+import {groupRecordsByMonth} from "@/app/(protected)/(reports)/branch-review/page";
+import ExportBottomSheet from "@/components/ExportBottomSheet";
 
 
 const DRAFT_STORAGE_KEY = "cachedStaffReviews";
@@ -188,6 +190,13 @@ export default function DailyActivityReport() {
 
         return <span className="text-gray-500">Unknown Record Type</span>;
     };
+
+    const groupedRecords = groupRecordsByMonth(staffInterviewRecords);
+
+    const sortedMonthKeys = Object.keys(groupedRecords).sort(
+        (a, b) => new Date(`${b}-01`).getTime() - new Date(`${a}-01`).getTime()
+    );
+
     return (
         <ScrollShadow>
 
@@ -219,37 +228,49 @@ export default function DailyActivityReport() {
                     : null}
 
 
-            <div className="flex flex-row items-center justify-between p-2.5">
-                <h2 className={`text-2xl font-extrabold`}>Staff Interview Report</h2>
-                <Button
-                    onPress={handleExportToExcel}
-                    isIconOnly
-                    color={'warning'}
-                    radius={'full'}
-                    variant={`faded`}
-                    className="shadow-secondary"
-                >
-                    <Download size={20}/>
-                </Button>
-            </div>
+           <ExportBottomSheet action={'staff-interview'} dailyActivityRecords={staffInterviewRecords} questions={questions} />
             <Divider/>
 
-            <CommonList
-                records={staffInterviewRecords}
-                confirmDelete={confirmDelete}
-                fetchRecords={fetchStaffInterview}
-                loading={staffInterviewLoading}
-                renderItemContent={renderItemContent}
-                action="staff-interview"
-                noRecordsActions={
-                    [
-                        {
-                            label: "Add Staff Interview Record",
-                            onPress: () => router.push("/forms/staff-interview"),
-                        },
-                    ]}
-            />
 
+            {sortedMonthKeys.length > 0 ? (
+                <Accordion selectionMode={'multiple'} defaultExpandedKeys={'all'}>
+                    {sortedMonthKeys.map((monthKey) => {
+                        const dateObj = new Date(`${monthKey}-01`);
+                        const monthLabel = format(dateObj, "MMMM yyyy");
+                        return (
+                            <AccordionItem
+                                key={monthKey}
+                                title={monthLabel}
+                                classNames={
+                                    {
+                                        title: "text-xl font-extrabold text-secondary px-4 shadow-white drop-shadow-xl"
+                                    }
+                                }
+
+                            >
+
+                                <CommonList
+                                    records={staffInterviewRecords}
+                                    confirmDelete={confirmDelete}
+                                    fetchRecords={fetchStaffInterview}
+                                    loading={staffInterviewLoading}
+                                    renderItemContent={renderItemContent}
+                                    action="staff-interview"
+                                    noRecordsActions={
+                                        [
+                                            {
+                                                label: "Add Staff Interview Record",
+                                                onPress: () => router.push("/forms/staff-interview"),
+                                            },
+                                        ]}
+                                />
+                            </AccordionItem>
+                        );
+                    })}
+                </Accordion>
+            ) : (
+                <p className="p-4 text-center">No records found.</p>
+            )}
         </ScrollShadow>
     );
 }

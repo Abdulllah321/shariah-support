@@ -7,30 +7,56 @@ import {Checkbox} from "@heroui/checkbox";
 import * as XLSX from "xlsx";
 import {CustomRadio} from "@/components/CustomRadio";
 import {Download} from "lucide-react";
+import {dailyActivityType} from "@/types/dailyactivityTypes";
+import {EmployeeData as BranchTypes} from "@/types/branchShariahTypes";
+import {EmployeeData} from "@/types/staffInterviewTypes";
+import {leadsType} from "@/types/360LeadsTypes";
+import {getFormattedData} from "@/components/getFornattedData";
+import  {Question} from "@/components/QuestionsList";
 
-interface DailyActivityRecord {
-    date: string;
-    name?: string;
-    activity?: string;
-    duration?: string;
-    city?: string;
-    remarks?: string;
-}
 
 interface ExportBottomSheetProps {
-    dailyActivityRecords: DailyActivityRecord[];
+    dailyActivityRecords: dailyActivityType[] | BranchTypes[] | EmployeeData[] | leadsType[];
+    questions?: Question[]
+    action: string
 }
 
-const ExportBottomSheet: React.FC<ExportBottomSheetProps> = ({dailyActivityRecords}) => {
+
+const ExportBottomSheet: React.FC<ExportBottomSheetProps> = ({dailyActivityRecords, action, questions}) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedFilter, setSelectedFilter] = useState<string>("all");
     const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
 
+    const getDateTypes = (action: string) => {
+        switch (action) {
+            case "daily-activity":
+                return "date";
+            case "branch-review":
+                return 'visitDate';
+            case "staff-interview":
+                return 'visitDate';
+            default:
+                return 'date';
+        }
+    };
+
+
+    const transformAction = (action: string | null): string => {
+        if (!action) return "Details";
+        return action
+            .replace(/-/g, " ")
+            .replace(/\b\w/g, (char) => char.toUpperCase());
+    };
+
     // Generate year-wise grouped months
     const availableMonths = useMemo(() => {
         const months = new Map<string, string[]>();
+        const selectedDate = getDateTypes(action);
+
         dailyActivityRecords.forEach((record) => {
-            const date = new Date(record.date);
+            // @ts-expect-error:@typescript-eslint/ban-ts-comment
+            const date = new Date(record[selectedDate]);
+            console.log(date)
             const monthKey = format(date, "yyyy-MM");
             const year = format(date, "yyyy");
             if (!months.has(year)) {
@@ -51,24 +77,30 @@ const ExportBottomSheet: React.FC<ExportBottomSheetProps> = ({dailyActivityRecor
     };
 
     const handleExportToExcel = () => {
-        let filteredData = dailyActivityRecords;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let filteredData: any[] = dailyActivityRecords;
         const today = new Date();
+        const selectedDate = getDateTypes(action);
 
         if (selectedFilter === "this-week") {
             const weekStart = startOfWeek(today, {weekStartsOn: 1});
             const weekEnd = endOfWeek(today, {weekStartsOn: 1});
+
             filteredData = dailyActivityRecords.filter((record) =>
-                isWithinInterval(new Date(record.date), {start: weekStart, end: weekEnd})
+                // @ts-expect-error:@typescript-eslint/ban-ts-comment
+                isWithinInterval(new Date(record[selectedDate]), {start: weekStart, end: weekEnd})
             );
         } else if (selectedFilter === "this-month") {
             const monthStart = startOfMonth(today);
             const monthEnd = endOfMonth(today);
             filteredData = dailyActivityRecords.filter((record) =>
-                isWithinInterval(new Date(record.date), {start: monthStart, end: monthEnd})
+                // @ts-expect-error:@typescript-eslint/ban-ts-comment
+                isWithinInterval(new Date(record[selectedDate]), {start: monthStart, end: monthEnd})
             );
         } else if (selectedMonths.length > 0) {
             filteredData = dailyActivityRecords.filter((record) => {
-                const recordMonth = format(new Date(record.date), "yyyy-MM");
+                // @ts-expect-error:@typescript-eslint/ban-ts-comment
+                const recordMonth = format(new Date(record[selectedDate]), "yyyy-MM");
                 return selectedMonths.includes(recordMonth);
             });
         }
@@ -78,15 +110,7 @@ const ExportBottomSheet: React.FC<ExportBottomSheetProps> = ({dailyActivityRecor
             return;
         }
 
-        const formattedData = filteredData.map((record) => ({
-            "Sharia Scholar": record.name || "N/A",
-            Date: format(new Date(record.date), "yyyy-MMM-dd"),
-            Day: new Date(record.date).toLocaleDateString("en-US", {weekday: "long"}),
-            "Activity / Title": record.activity || "N/A",
-            Duration: record.duration || "N/A",
-            City: record.city || "N/A",
-            Remarks: record.remarks || "N/A",
-        }));
+        const formattedData = getFormattedData(filteredData, action, questions)
 
         const ws = XLSX.utils.json_to_sheet(formattedData);
         const wb = XLSX.utils.book_new();
@@ -116,7 +140,7 @@ const ExportBottomSheet: React.FC<ExportBottomSheetProps> = ({dailyActivityRecor
     return (
         <>
             <div className="flex flex-row items-center justify-between p-2.5">
-                <h2 className={`text-2xl font-extrabold`}>Daily Activity Report</h2>
+                <h2 className={`text-2xl font-extrabold capitalize`}>{transformAction(action)} Report</h2>
 
 
                 <Button
