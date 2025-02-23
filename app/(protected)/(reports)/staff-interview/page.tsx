@@ -1,14 +1,12 @@
 "use client"
 import {useRecord} from "@/context/RecordContext";
-import * as XLSX from 'xlsx';
 import {format} from "date-fns";
 import {deleteDoc} from "@firebase/firestore";
 import {collection, doc, getDocs,  query} from "firebase/firestore";
 import {db} from "@/lib/firebase";
 import {ScrollShadow} from "@heroui/scroll-shadow";
 import {dailyActivityType} from "@/types/dailyactivityTypes";
-import {Accordion, AccordionItem, Button, Card} from "@heroui/react";
-import {Download} from "lucide-react";
+import {Accordion, AccordionItem, Card} from "@heroui/react";
 import CommonList from "@/components/CommonList";
 import {EmployeeData as branchShariahTypes} from "@/types/branchShariahTypes";
 import {EmployeeData as staffInterviewTypes} from "@/types/staffInterviewTypes";
@@ -19,18 +17,11 @@ import {useEffect, useState} from "react";
 import {Question} from "@/components/QuestionsList";
 import {CardHeader} from "@heroui/card";
 import {getFormattedDate} from "@/constants";
-import {groupRecordsByMonth} from "@/app/(protected)/(reports)/branch-review/page";
 import ExportBottomSheet from "@/components/ExportBottomSheet";
+import {groupRecordsByMonth} from "@/components/getFornattedData";
 
 
 const DRAFT_STORAGE_KEY = "cachedStaffReviews";
-
-
-interface RowDataType {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [key: string]: any; // Adjust 'any' to a more specific type if possible
-}
-
 
 export default function DailyActivityReport() {
     const {staffInterviewRecords, staffInterviewLoading, fetchStaffInterview,} = useRecord();
@@ -77,62 +68,6 @@ export default function DailyActivityReport() {
         fetchQuestions()
     }, []);
 
-    // Export function
-    const handleExportToExcel = () => {
-        try {
-
-            const formattedData = staffInterviewRecords.map((record: branchShariahTypes) => {
-                const rowData:RowDataType  = {
-                    "Sharia Scholar": record.name || "N/A",
-                    "Branch Code": record.branchCode || "N/A",
-                    "Branch City": record.city || "N/A",
-                    Province: record.province || "N/A",
-                    "Branch Region": record.region || "N/A",
-                    "Visit Date": record.visitDate
-                        ? format(new Date(record.visitDate), "yyyy-MMM-dd") // Ensure correct format
-                        : "N/A", "Staff Name": record.staffName,
-                    Designation: record.designation,
-                    "Employee Number": record.employeeName,
-                    "Date of Joining": record.dateOfJoining,
-                };
-
-
-                questions?.forEach((question: { question: string }) => {
-                    if (record[question.question]) {
-                        rowData[question.question] = record[question.question];
-                    } else {
-                        rowData[question.question] = "N/A"; // Default value if the key does not exist in the record
-                    }
-                });
-
-                console.log(rowData)
-
-                return rowData;
-            });
-
-
-            if (!formattedData || formattedData.length === 0) {
-                throw new Error("No data available to export");
-            }
-
-            const ws = XLSX.utils.json_to_sheet(formattedData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Daily Activity Report");
-
-            const excelBuffer = XLSX.write(wb, {bookType: "xlsx", type: "array"});
-            const blob = new Blob([excelBuffer], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "Staff Interview Report.xlsx";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } catch (error) {
-            console.error("Error exporting report:", error);
-            alert("Error: Failed to export the report.");
-        }
-    };
 
     // Delete function
     const confirmDelete = async (id: string) => {

@@ -1,14 +1,12 @@
 "use client"
 import {useRecord} from "@/context/RecordContext";
-import * as XLSX from 'xlsx';
 import {format} from "date-fns";
 import {deleteDoc} from "@firebase/firestore";
 import {collection, doc, getDocs, orderBy, query} from "firebase/firestore";
 import {db} from "@/lib/firebase";
 import {ScrollShadow} from "@heroui/scroll-shadow";
 import {dailyActivityType} from "@/types/dailyactivityTypes";
-import {Accordion, AccordionItem, Button, Card} from "@heroui/react";
-import {Download} from "lucide-react";
+import {Accordion, AccordionItem, Card} from "@heroui/react";
 import CommonList from "@/components/CommonList";
 import {EmployeeData as branchShariahTypes} from "@/types/branchShariahTypes";
 import {EmployeeData as staffInterviewTypes} from "@/types/staffInterviewTypes";
@@ -20,23 +18,10 @@ import {Question} from "@/components/QuestionsList";
 import {CardHeader} from "@heroui/card";
 import {getFormattedDate} from "@/constants";
 import ExportBottomSheet from "@/components/ExportBottomSheet";
+import {groupRecordsByMonth} from "@/components/getFornattedData";
 
 
 const DRAFT_STORAGE_KEY = "cachedBranchShariahReviews";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const groupRecordsByMonth = (records: any[]) => {
-    return records.reduce((groups, record) => {
-        const date = new Date(record.visitDate);
-        const monthKey = format(date, "yyyy-MM");
-        if (!groups[monthKey]) {
-            groups[monthKey] = [];
-        }
-        groups[monthKey].push(record);
-        return groups;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }, {} as Record<string, any[]>);
-};
 
 export default function DailyActivityReport() {
     const {branchShariahRecords, branchShariahLoading, fetchBranchShariah} = useRecord();

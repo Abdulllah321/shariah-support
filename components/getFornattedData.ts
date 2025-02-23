@@ -36,6 +36,7 @@ export const getFormattedData = (filteredData: any[], action: string, questions?
             });
         case "staff-interview":
             return filteredData.map((record) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const rowData: Record<string, any> = {
                     "Sharia Scholar": record.name || "N/A",
                     "Branch Code": record.branchCode || "N/A",
@@ -78,4 +79,18 @@ export const getFormattedData = (filteredData: any[], action: string, questions?
         default:
             return filteredData;
     }
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const groupRecordsByMonth = (records: any[]) => {
+    return records.reduce((groups, record) => {
+        const date = new Date(record.visitDate);
+        const monthKey = format(date, "yyyy-MM");
+        if (!groups[monthKey]) {
+            groups[monthKey] = [];
+        }
+        groups[monthKey].push(record);
+        return groups;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }, {} as Record<string, any[]>);
 };
