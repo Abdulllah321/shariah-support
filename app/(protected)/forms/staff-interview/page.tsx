@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import useDailyActivityFormFields from "@/constants/StaffInterviewForm";
 import FormGenerator from "@/components/FormGenerator";
 import {useRouter} from "next/navigation";
-import {addDoc, setDoc} from "@firebase/firestore";
+import {addDoc, orderBy, setDoc} from "@firebase/firestore";
 import {collection, doc, getDocs, query} from "firebase/firestore";
 import {db} from "@/lib/firebase";
 import {useRecord} from "@/context/RecordContext";
@@ -35,7 +35,7 @@ const Page = () => {
     const fetchQuestions = async () => {
         setQuestionLoading(true);
         try {
-            const questionQuery = query(collection(db, "sQuestion"));
+            const questionQuery = query(collection(db, "sQuestion"), orderBy("order"));
             const questionSnapshot = await getDocs(questionQuery);
 
             const questionList = questionSnapshot.docs.map((doc) => ({

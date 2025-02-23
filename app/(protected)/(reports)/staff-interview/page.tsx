@@ -1,7 +1,7 @@
 "use client"
 import {useRecord} from "@/context/RecordContext";
 import {format} from "date-fns";
-import {deleteDoc} from "@firebase/firestore";
+import {deleteDoc, orderBy} from "@firebase/firestore";
 import {collection, doc, getDocs,  query} from "firebase/firestore";
 import {db} from "@/lib/firebase";
 import {ScrollShadow} from "@heroui/scroll-shadow";
@@ -48,9 +48,8 @@ export default function DailyActivityReport() {
 
     const fetchQuestions = async () => {
         try {
-            const questionQuery = query(
-                collection(db, "sQuestion")
-            );
+            const questionQuery = query(collection(db, "sQuestion"), orderBy("order"));
+
             const questionSnapshot = await getDocs(questionQuery);
 
             const questionList: Question[] = questionSnapshot.docs.map((doc) => ({

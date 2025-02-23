@@ -1,6 +1,7 @@
 import {db} from "@/lib/firebase";
 import {collection, getDocs, query} from "firebase/firestore";
 import {Calendar, ClipboardList, Flag, IdCard, Landmark, MapPin, Tag, User} from "lucide-react";
+import {orderBy} from "@firebase/firestore";
 
 
 type Record = {
@@ -29,7 +30,7 @@ const formatDate = (date?: string): string => {
 
 const fetchQuestions = async (): Promise<{ id: string; question: string }[]> => {
     try {
-        const questionQuery = query(collection(db, "sQuestion"));
+        const questionQuery = query(collection(db, "sQuestion"), orderBy("order"));
         const questionSnapshot = await getDocs(questionQuery);
 
         return questionSnapshot.docs.map((doc) => ({
