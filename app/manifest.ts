@@ -7,20 +7,13 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "To create awareness of Islamic banking among the public, Training at LnD and corporate CBSME and Agri client visits.",
     start_url: "/daily-activity",
     scope: "/daily-activity",
-    display: "standalone",
+    display: "fullscreen", // Fullscreen mode
     background_color: "#ffffff",
     theme_color: "#000000",
     orientation: "portrait",
     dir: "ltr",
     lang: "en",
     id: "sss",
-    display_override: [
-      "standalone",
-      "minimal-ui",
-      "fullscreen",
-      "browser",
-      "window-controls-overlay"
-    ],
     icons: [
       {
         src: "/android-chrome-192x192.png",
@@ -33,6 +26,6 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/png",
       }
     ],
-    categories: ["productivity"]
+    categories: ["productivity"],
   };
 }
