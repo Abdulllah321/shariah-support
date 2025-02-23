@@ -121,7 +121,7 @@ const FormGenerator: React.FC<FormGeneratorProps> = ({
                                     // @ts-expect-error:@typescript-eslint/ ban-ts-comment
                                     value={
                                         values[field.value!]
-                                            ? parseDate(values[field.value!]) // Convert string to DateValue
+                                            ? parseDate(values[field.value!].split("T")[0]) // Convert ISO to YYYY-MM-DD
                                             : undefined
                                     }
                                     onChange={(date: DateValue | null) =>

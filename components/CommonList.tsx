@@ -92,7 +92,7 @@ const CommonList: React.FC<CommonListProps> = ({
                     {records.map((item, index) => (
                         <ListboxItem
                             key={item.id || index}
-                            onClick={() => router.push(`/detail/${item.id}?action=${action}`)}
+                            onPress={() => router.push(`/detail/${item.id}?action=${action}`)}
                             variant={'shadow'}
                             className={`w-full`}
                         >
@@ -109,31 +109,29 @@ const CommonList: React.FC<CommonListProps> = ({
                                     </div>
                                     <div className="flex space-x-2">
                                         <Button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                router.push(`/forms/${action}?id=${item.id}`);
-                                            }}
+                                            onPress={() => router.push(`/forms/${action}?id=${item.id}`)}
+                                            onTouchStart={(e) => e.stopPropagation()} // موبائل کے لیے ٹچ ایونٹ ہینڈل کریں
                                             isIconOnly
-                                            radius={'full'}
-                                            variant={'flat'}
-                                            className={'shadow-foreground !shadow-md mr-1'}
-                                            color={"warning"}
+                                            radius="full"
+                                            variant="flat"
+                                            className="shadow-foreground !shadow-md mr-1"
+                                            color="warning"
                                         >
                                             <Pencil size={16} />
                                         </Button>
+
                                         <Button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                openDeleteModal(item.id!);
-                                            }}
+                                            onPress={() => openDeleteModal(item.id!)}
+                                            onTouchStart={(e) => e.stopPropagation()} // موبائل کے لیے ٹچ ایونٹ ہینڈل کریں
                                             isIconOnly
-                                            radius={'full'}
-                                            variant={'shadow'}
-                                            className={'shadow-foreground !shadow-md'}
-                                            color={"danger"}
+                                            radius="full"
+                                            variant="shadow"
+                                            className="shadow-foreground !shadow-md"
+                                            color="danger"
                                         >
                                             <Trash2 size={16} />
                                         </Button>
+
                                     </div>
                                 </div>
                             </Card>

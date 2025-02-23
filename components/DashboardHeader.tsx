@@ -26,7 +26,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                                                          }) => {
     const [visible, setVisible] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
-    const [isEmpIdVisible, setIsEmpIdVisible] = useState(false); 
+    const [isEmpIdVisible, setIsEmpIdVisible] = useState(false);
 
     const openLogoutModal = () => setVisible(true);
     const closeLogoutModal = () => setVisible(false);
@@ -124,7 +124,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 </div>
 
                 {/* Logout Confirmation Modal */}
-                <Modal isOpen={visible} onClose={closeLogoutModal}>
+                <Modal isOpen={visible} onClose={closeLogoutModal} placement={'center'}>
                     <ModalContent>
 
                         <ModalHeader>Confirm Logout</ModalHeader>
