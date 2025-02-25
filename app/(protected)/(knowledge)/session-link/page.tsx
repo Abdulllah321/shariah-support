@@ -4,7 +4,6 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { format } from "date-fns";
 import {Button, Card} from "@heroui/react";
-import {Link} from "lucide-react";
 
 interface SessionLink {
     id: string;
