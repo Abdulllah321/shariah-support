@@ -80,23 +80,25 @@ html, body {
   background-color: hsl(var(--background-muted)) !important;
 }
 
-::-webkit-scrollbar {
-  width: 10px;
-}
+@media (hover: hover) and (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
 
-/* Track */
-::-webkit-scrollbar-track {
-  background: hsl(var(--background));
-  border-radius: 5px;
-}
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+    border-radius: 5px;
+  }
 
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted));
-  border-radius: 5px;
-}
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 5px;
+  }
 
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--background-hover));
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--background-hover));
+  }
 }

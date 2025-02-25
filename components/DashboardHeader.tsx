@@ -107,20 +107,17 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                         <span>Score:</span>
                         <span className="text-3xl font-bold">{score}</span>
                     </div>
-
                     {/* Score Details Button */}
-                    <Button
-                        variant="shadow"
-
-                        radius="full"
-                        className="mx-auto bg-white shadow-white/50 dark:bg-primary dark:shadow-primary/50"
-                        size="lg"
-                        onPress={handleScoreDetails}
-                    >
-                        <Eye className="w-6 h-6 mr-2"/> {/* Icon added here */}
-                        View Details
-                    </Button>
-
+                        <Button
+                            variant="shadow"
+                            radius="full"
+                            className="bg-white shadow-white/50 dark:bg-primary dark:shadow-primary/50 mx-auto"
+                            size="lg"
+                            onPress={handleScoreDetails}
+                        >
+                            <Eye className="w-6 h-6 mr-2"/> {/* Icon added here */}
+                            View Details
+                        </Button>
                 </div>
 
                 {/* Logout Confirmation Modal */}

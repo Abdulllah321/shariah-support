@@ -12,17 +12,17 @@ const Layout = ({children}: { children: ReactNode }) => {
     const handleScoreDetails = () => {
         router.push("/score")
     }
-    const {dailyActivityRecords} = useRecord()
+
+    const {dailyActivityRecords} = useRecord();
     const totalScore = dailyActivityRecords.reduce((sum, record) => {
         const score = typeof record.score === "string" ? parseInt(record.score, 10) : record.score;
         return sum + (isNaN(score) ? 0 : score);
     }, 0);
+
     return (
         <div className={`w-full md:w-1/2 mx-auto`}>
             <DashboardHeader handleLogout={logout} handleScoreDetails={handleScoreDetails} empId={user?.employeeId}
-                             username={user?.username} score={totalScore}/>
-
-
+                             username={user?.username} score={totalScore} />
             {children}
         </div>
     );
