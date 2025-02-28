@@ -232,7 +232,7 @@ const Dashboard: React.FC = () => {
             <div className="mt-10 p-4 md:p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
                 <h2 className="text-xl font-semibold mb-4">Activity Distribution</h2>
                 {chartData ? (
-                    <Bar data={chartData} options={{responsive: true}} className="h-[300px] md:h-[400px]"/>
+                    <Bar data={chartData} options={{responsive: true}} className="h-[400px]"/>
                 ) : (
                     <p><Spinner/>Loading chart...</p>
                 )}
