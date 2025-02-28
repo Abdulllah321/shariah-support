@@ -17,6 +17,7 @@ interface DashboardHeaderProps {
     activities?: string[];
     handleLogout: () => void;
     handleScoreDetails: () => void;
+    loading: boolean;
 }
 
 const AnimatedNumber = ({value}: { value: number }) => {
@@ -37,6 +38,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                                                              empId,
                                                              score = 0,
                                                              activities,
+                                                             loading,
                                                              handleLogout,
                                                              handleScoreDetails,
                                                          }) => {
@@ -100,7 +102,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                                 <div className="text-xl font-bold text-secondary">Asslam u alikum,</div>
                                 <div className="text-2xl font-extrabold text-primary-500">{username}</div>
                                 <div className="text-lg font-semibold text-gray-300">
-                                    Score: <AnimatedNumber value={Number(score)} />
+                                    Score: <AnimatedNumber value={Number(score)}/>
                                 </div>
                             </div>
 
@@ -116,7 +118,12 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     <div className={'flex items-center justify-between w-full '}>
 
                         <div className="flex flex-col items-center space-y-3 w-full">
-                            {activities?.map((activity, index) => {
+                            {loading ? <div className="flex flex-col items-center space-y-3 w-full">
+
+                                <Skeleton className={'w-full h-10 rounded-full'}/>
+                                <Skeleton className={'w-full h-10 rounded-full scale-90'}/>
+                                <Skeleton className={'w-full h-10 rounded-full scale-80'}/>
+                            </div> : activities?.map((activity, index) => {
                                 // Rank-specific styles
                                 const rankStyles = [
                                     "bg-yellow-500/30 border-yellow-400 text-yellow-200 shadow-yellow-500/40", // 🥇 Gold
@@ -137,9 +144,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                                     >
                                         <div className="absolute left-3 top-1/2 -translate-y-1/2">
                                             {index < 3 ? (
-                                                <Trophy className="w-6 h-6" strokeWidth={2} />
+                                                <Trophy className="w-6 h-6" strokeWidth={2}/>
                                             ) : (
-                                                <Award className="w-6 h-6" strokeWidth={2} />
+                                                <Award className="w-6 h-6" strokeWidth={2}/>
                                             )}
                                         </div>
                                         <span className="ml-8 whitespace-nowrap">{index + 1}. {activity}</span>
@@ -147,7 +154,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                                 );
                             })}
                         </div>
-
 
 
                     </div>

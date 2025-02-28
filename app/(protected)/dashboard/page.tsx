@@ -16,7 +16,7 @@ import {
     Legend,
 } from "chart.js";
 import {useTheme} from "next-themes";
-import {Activity, Archive, ClipboardList} from "lucide-react";
+import {Activity} from "lucide-react";
 import {dailyActivityType} from "@/types/dailyactivityTypes";
 import {Spinner} from "@heroui/react";
 import dayjs from "dayjs";
@@ -28,7 +28,6 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tool
 
 const Dashboard: React.FC = () => {
     const [totalScores, setTotalScores] = useState(0);
-    const [recordsCount, setRecordsCount] = useState<number>(0);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [chartData, setChartData] = useState<any>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,8 +35,6 @@ const Dashboard: React.FC = () => {
     const [selectedMonth, setSelectedMonth] = useState<string>(dayjs().format("YYYY-MM"));
     const [availableMonths, setAvailableMonths] = useState<{ value: string; label: string }[]>([]);
     const [monthlyCategoryMap, setMonthlyCategoryMap] = useState<Record<string, Record<string, number>>>({});
-    const [currentMonthScore, setCurrentMonthScore] = useState(0);
-    const [currentMonthActivities, setCurrentMonthActivities] = useState<string[]>([]);
     const [topActivity, setTopActivity] = useState("None");
 
 
@@ -54,7 +51,7 @@ const Dashboard: React.FC = () => {
                     where("employeeId", "==", user.employeeId)
                 );
                 const recordsSnapshot = await getDocs(recordsQuery);
-                setRecordsCount(recordsSnapshot.size);
+
 
                 const categoryMap: Record<string, number> = {};
                 let totalScore = 0;
@@ -63,6 +60,7 @@ const Dashboard: React.FC = () => {
 
                 const currentMonth = dayjs().format("YYYY-MM");
 
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 let currentMonthScore = 0;
                 const currentMonthActivities: string[] = [];
                 const activityFrequency: Record<string, number> = {};
@@ -101,8 +99,6 @@ const Dashboard: React.FC = () => {
 
                 setTotalScores(totalScore);
                 setMonthlyCategoryMap(monthlyData);
-                setCurrentMonthScore(currentMonthScore);
-                setCurrentMonthActivities(currentMonthActivities);
                 setTopActivity(topActivity);
 
                 // Set available months dynamically
@@ -179,7 +175,6 @@ const Dashboard: React.FC = () => {
         updatePieChart(selectedMonth, monthlyCategoryMap);
     };
 
-
     return (
         <div className="min-h-screen p-4 md:p-6">
             <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
@@ -192,30 +187,6 @@ const Dashboard: React.FC = () => {
                     value={totalScores}
                     icon={Activity}
                     color="bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-400/50"
-                />
-
-                {/* Total Records */}
-                <StatCard
-                    title="Total Records"
-                    value={recordsCount}
-                    icon={Archive }
-                    color="bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-400/50"
-                />
-
-                {/* Current Month Score */}
-                <StatCard
-                    title="Current Month Score"
-                    value={currentMonthScore}
-                    icon={Activity}
-                    color="bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-400/50"
-                />
-
-                {/* Current Month Activities */}
-                <StatCard
-                    title="Current Month Activities"
-                    value={currentMonthActivities.length}
-                    icon={ClipboardList}
-                    color="bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-400/50"
                 />
 
                 {/* Top Activity of the Month */}
@@ -232,7 +203,36 @@ const Dashboard: React.FC = () => {
             <div className="mt-10 p-4 md:p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
                 <h2 className="text-xl font-semibold mb-4">Activity Distribution</h2>
                 {chartData ? (
-                    <Bar data={chartData} options={{responsive: true}} className="h-[400px]"/>
+                    <Bar data={chartData} options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 1000,
+                            easing: "easeInOutQuad",
+                        },
+                        plugins: {
+                            legend: {display: false},
+                            tooltip: {enabled: true},
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    autoSkip: true,
+                                    maxRotation: 90,
+                                    minRotation: 90,
+                                    callback: function (value) {
+                                        const label = this.getLabelForValue(value as number);
+                                        return label.length > 10 ? label.substring(0, 10) + "..." : label;
+                                    },
+                                },
+                            },
+                            y: {
+                                beginAtZero: true,
+                            },
+                        },
+                    }}
+                         className="h-[300px] md:h-[400px] max-h-[400px]"
+                    />
                 ) : (
                     <p><Spinner/>Loading chart...</p>
                 )}

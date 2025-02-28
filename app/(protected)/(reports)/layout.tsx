@@ -14,7 +14,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
         router.push("/score");
     };
 
-    const { dailyActivityRecords } = useRecord();
+    const { dailyActivityRecords, dailyActivityLoading:loading } = useRecord();
 
     // ✅ Calculate Total Score
     const totalScore = dailyActivityRecords.reduce((sum, record) => {
@@ -45,7 +45,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
                 empId={user?.employeeId}
                 username={user?.username}
                 score={totalScore}
-                activities={topActivities} // 🔥 Pass Top 3 Activities
+                activities={topActivities} loading={loading}
             />
             {children}
         </div>
