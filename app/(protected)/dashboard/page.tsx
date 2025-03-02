@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import {db} from "@/lib/firebase";
 import {collection, getDocs, query, where} from "firebase/firestore";
 import {useAuth} from "@/context/AuthContext";
-import {Bar} from "react-chartjs-2";
+import {Bar, Doughnut} from "react-chartjs-2";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -18,11 +18,9 @@ import {
 import {useTheme} from "next-themes";
 import {Activity} from "lucide-react";
 import {dailyActivityType} from "@/types/dailyactivityTypes";
-import {Spinner} from "@heroui/react";
+import {Skeleton, Spinner} from "@heroui/react";
 import dayjs from "dayjs";
-import {Doughnut} from "react-chartjs-2";
 import StatCard from "@/components/StatCard";
-
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
@@ -32,11 +30,11 @@ const Dashboard: React.FC = () => {
     const [chartData, setChartData] = useState<any>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [pieChartData, setPieChartData] = useState<any>(null);
-    const [selectedMonth, setSelectedMonth] = useState<string>(dayjs().format("YYYY-MM"));
+    const [loading, setLoading] = useState(false)
+    const [selectedMonth, setSelectedMonth] = useState<string>();
     const [availableMonths, setAvailableMonths] = useState<{ value: string; label: string }[]>([]);
     const [monthlyCategoryMap, setMonthlyCategoryMap] = useState<Record<string, Record<string, number>>>({});
     const [topActivity, setTopActivity] = useState("None");
-
 
     const {user} = useAuth();
     const {theme} = useTheme();
@@ -46,23 +44,14 @@ const Dashboard: React.FC = () => {
 
         const fetchData = async () => {
             try {
-                const recordsQuery = query(
-                    collection(db, "records"),
-                    where("employeeId", "==", user.employeeId)
-                );
+                setLoading(true)
+                const recordsQuery = query(collection(db, "records"), where("employeeId", "==", user.employeeId));
                 const recordsSnapshot = await getDocs(recordsQuery);
-
 
                 const categoryMap: Record<string, number> = {};
                 let totalScore = 0;
                 const monthlyData: Record<string, Record<string, number>> = {};
                 const uniqueMonths = new Set<string>();
-
-                const currentMonth = dayjs().format("YYYY-MM");
-
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                let currentMonthScore = 0;
-                const currentMonthActivities: string[] = [];
                 const activityFrequency: Record<string, number> = {};
 
                 recordsSnapshot.forEach((doc) => {
@@ -82,20 +71,15 @@ const Dashboard: React.FC = () => {
 
                     uniqueMonths.add(recordMonth);
 
-                    // If record belongs to the current month
-                    if (recordMonth === currentMonth) {
-                        currentMonthScore += Number(data.score) || 0;
-                        currentMonthActivities.push(activityType);
-                        activityFrequency[activityType] = (activityFrequency[activityType] || 0) + 1;
-                    }
+                    // Count most frequent activity
+                    activityFrequency[activityType] = (activityFrequency[activityType] || 0) + 1;
                 });
 
-                // Find the most frequent activity of this month
-                const topActivity =
-                    Object.entries(activityFrequency).reduce(
-                        (top, entry) => (entry[1] > (top[1] || 0) ? entry : top),
-                        ["None", 0]
-                    )[0];
+                // Find the most frequent activity
+                const topActivity = Object.entries(activityFrequency).reduce(
+                    (top, entry) => (entry[1] > (top[1] || 0) ? entry : top),
+                    ["None", 0]
+                )[0];
 
                 setTotalScores(totalScore);
                 setMonthlyCategoryMap(monthlyData);
@@ -110,6 +94,7 @@ const Dashboard: React.FC = () => {
                     }));
 
                 setAvailableMonths(sortedMonths);
+                setSelectedMonth(sortedMonths[0].value)
                 // Update charts
                 setChartData({
                     labels: Object.keys(categoryMap),
@@ -122,39 +107,25 @@ const Dashboard: React.FC = () => {
                         },
                     ],
                 });
-                // Update pie chart
-                updatePieChart(selectedMonth, monthlyData);
+                // Ensure pie chart updates correctly
+                updatePieChart(sortedMonths[0].value, monthlyData);
             } catch (error) {
                 console.error("Error fetching data: ", error);
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchData();
     }, [user?.employeeId, theme]);
 
-
     const professionalColors = [
-        "#4E79A7", // Blue
-        "#F28E2B", // Orange
-        "#E15759", // Red
-        "#76B7B2", // Teal
-        "#59A14F", // Green
-        "#EDC949", // Yellow
-        "#B07AA1", // Purple
-        "#FF9DA7", // Soft Pink
-        "#9C755F", // Brown
-        "#BAB0AC", // Gray
-        "#D37295", // Magenta
-        "#8CD17D", // Light Green
-        "#6A3D9A", // Deep Violet
-        "#BD5F00", // Deep Orange
-        "#5F9EA0", // Dark Cyan
+        "#4E79A7", "#F28E2B", "#E15759", "#76B7B2", "#59A14F", "#EDC949", "#B07AA1", "#FF9DA7",
+        "#9C755F", "#BAB0AC", "#D37295", "#8CD17D", "#6A3D9A", "#BD5F00", "#5F9EA0",
     ];
-
 
     const updatePieChart = (month: string, dataMap: Record<string, Record<string, number>>) => {
         const dataForMonth = dataMap[month] || {};
-
         setPieChartData({
             labels: Object.keys(dataForMonth),
             datasets: [
@@ -168,7 +139,6 @@ const Dashboard: React.FC = () => {
         });
     };
 
-
     const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedMonth = e.target.value;
         setSelectedMonth(selectedMonth);
@@ -179,14 +149,15 @@ const Dashboard: React.FC = () => {
         <div className="min-h-screen p-4 md:p-6">
             <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
-            {/* Stat Cards */}
-            <div className="grid gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {/* Stat Cards (Only First and Last) */}
+            <div className="grid gap-4 md:grid-cols-2">
                 {/* Total Scores */}
                 <StatCard
                     title="Total Scores"
                     value={totalScores}
                     icon={Activity}
-                    color="bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-400/50"
+                    loading={loading}
+                    color="bg-gradient-to-r  from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-400/50"
                 />
 
                 {/* Top Activity of the Month */}
@@ -194,13 +165,13 @@ const Dashboard: React.FC = () => {
                     title="Top Activity of the Month"
                     value={topActivity}
                     icon={Activity}
+                    loading={loading}
                     color="bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg shadow-orange-400/50"
                 />
             </div>
 
-
             {/* Activity Distribution Chart */}
-            <div className="mt-10 p-4 md:p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <div className="mt-10 p-4 md:p-6 bg-white dark:bg-neutral-950 shadow-lg rounded-lg">
                 <h2 className="text-xl font-semibold mb-4">Activity Distribution</h2>
                 {chartData ? (
                     <Bar data={chartData} options={{
@@ -232,18 +203,43 @@ const Dashboard: React.FC = () => {
                         },
                     }}
                          className="h-[300px] md:h-[400px] max-h-[400px]"
-                    />
-                ) : (
-                    <p><Spinner/>Loading chart...</p>
+                    />) : (
+                    <div className="h-[300px] md:h-[400px] max-h-[400px] flex flex-col justify-between p-4">
+                        {/* X-Axis Labels Skeleton */}
+                        <div className="flex justify-between mb-4">
+                            {Array.from({ length: 5 }).map((_, index) => (
+                                <Skeleton key={index} className="h-4 w-10 rounded" />
+                            ))}
+                        </div>
+
+                        {/* Bars Skeleton */}
+                        <div className="flex justify-between items-end space-x-3">
+                            {Array.from({ length: 6 }).map((_, index) => (
+                                <Skeleton
+                                    key={index}
+                                    className={`w-8 rounded-md ${
+                                        index % 2 === 0 ? "h-24" : "h-32"
+                                    }`}
+                                />
+                            ))}
+                        </div>
+
+                        {/* Y-Axis Labels Skeleton */}
+                        <div className="flex  items-start space-y-2 mt-4 justify-between">
+                            {Array.from({ length: 6 }).map((_, index) => (
+                                <Skeleton key={index} className="w-5 h-12 rounded" />
+                            ))}
+                        </div>
+                    </div>
                 )}
             </div>
 
             {/* Pie Chart - Activity Distribution by Month */}
-            <div className="mt-10 p-4 md:p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <div className="mt-10 p-4 md:p-6 bg-white dark:bg-neutral-950 shadow-lg rounded-lg">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-semibold">Activity Distribution by Month</h2>
                     <select
-                        className="p-2 border rounded-md dark:bg-gray-700"
+                        className="p-2 border rounded-md dark:bg-neutral-700"
                         value={selectedMonth}
                         onChange={handleMonthChange}
                     >
@@ -257,14 +253,28 @@ const Dashboard: React.FC = () => {
                             <option value="">No data available</option>
                         )}
                     </select>
-
                 </div>
                 {pieChartData ? (
                     <Doughnut data={pieChartData}
                               options={{responsive: true, plugins: {legend: {position: "bottom"}}}}/>
                 ) : (
-                    <p><Spinner/>Loading chart...</p>
-                )}
+                    <div className="flex flex-col items-center justify-center space-y-4">
+                        {/* Donut Chart Placeholder */}
+                        <div className="relative">
+                            <Skeleton className="w-40 h-40 rounded-full" />
+                            <Skeleton className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-700"  />
+                        </div>
+
+                        {/* Legend Placeholder */}
+                        <div className="flex flex-col space-y-2 w-full px-8">
+                            {Array.from({ length: 3 }).map((_, index) => (
+                                <div key={index} className="flex items-center space-x-2">
+                                    <Skeleton className="w-4 h-4 rounded-full" />
+                                    <Skeleton className="w-20 h-4 rounded" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>                )}
             </div>
         </div>
     );
