@@ -239,7 +239,7 @@ const Dashboard: React.FC = () => {
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-semibold">Activity Distribution by Month</h2>
                     <select
-                        className="p-2 border rounded-md dark:bg-neutral-700"
+                        className="p-2 border rounded-md  bg-white dark:bg-neutral-700"
                         value={selectedMonth}
                         onChange={handleMonthChange}
                     >
