@@ -18,7 +18,7 @@ import {
 import {useTheme} from "next-themes";
 import {Activity} from "lucide-react";
 import {dailyActivityType} from "@/types/dailyactivityTypes";
-import {Skeleton, Spinner} from "@heroui/react";
+import {Skeleton} from "@heroui/react";
 import dayjs from "dayjs";
 import StatCard from "@/components/StatCard";
 
