@@ -1,6 +1,18 @@
 import {db} from "@/lib/firebase";
 import {collection, getDocs, query} from "firebase/firestore";
-import {Calendar, ClipboardList, Flag, IdCard, Landmark, MapPin, Tag, User} from "lucide-react";
+import {
+    Calendar,
+    ClipboardCheck,
+    ClipboardList,
+    Flag,
+    IdCard,
+    Landmark,
+    MapPin,
+    Repeat,
+    Shirt,
+    Tag,
+    User
+} from "lucide-react";
 import {orderBy} from "@firebase/firestore";
 
 
@@ -55,6 +67,9 @@ const getStaffInterviewList = async (record: Record) => {
         {label: "Designation", value: record.designation || "N/A", icon: <Tag/>},
         {label: "Employee Number", value: record.employeeName || "N/A", icon: <IdCard/>},
         {label: "Date of Joining", value: formatDate(record.dateOfJoining), icon: <Calendar/>},
+        {label: "Mandatory Planning", value: record.mandatoryPlanning || "N/A", icon: <ClipboardCheck/>},
+        {label: "Refresher", value: record.refresher || "N/A", icon: <Repeat/>},
+        {label: "Dress Code", value: record.dressCode || "N/A", icon: <Shirt/>},
     ];
 
     const questions = await fetchQuestions();
@@ -67,7 +82,6 @@ const getStaffInterviewList = async (record: Record) => {
 
     branchData.push({
         label: "Questions",
-        // @ts-expect-error:@typescript-eslint/ ban-ts-comment
         value: questionData.length > 0 ? questionData : "N/A",
         icon: <ClipboardList/>,
     });
