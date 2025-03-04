@@ -3,9 +3,6 @@ import {fetchBranches} from "@/constants/DailyActivityForm";
 import {FormField} from "@/components/FormGenerator";
 
 
-
-
-
 const useDailyActivityForm = () => {
     const [branchCodes, setBranchCodes] = useState<string[]>([]);
     const [branchNames, setBranchNames] = useState<string[]>([]);
@@ -24,7 +21,7 @@ const useDailyActivityForm = () => {
         loadData();
     }, []);
 
-    return {branchCodes, branchNames,  branchLoading};
+    return {branchCodes, branchNames, branchLoading};
 };
 
 
@@ -94,6 +91,25 @@ const useDailyActivityFormFields = () => {
             value: "dateOfJoining",
             label: "Date of joining",
             type: "date",
+            required: true,
+        },
+        {
+            type: "divider"
+        },
+        {
+            value: "mandatoryPlanning",
+            label: "Mandatory Planning",
+            type: "text",
+            required: true,
+        }, {
+            value: "refresher",
+            label: "Refresher",
+            type: "text",
+            required: true,
+        }, {
+            value: "dressCode",
+            label: "Dress Code",
+            type: "text",
             required: true,
         },
     ];
