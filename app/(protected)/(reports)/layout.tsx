@@ -14,7 +14,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
         router.push("/score");
     };
 
-    const { dailyActivityRecords, dailyActivityLoading:loading } = useRecord();
+    const { dailyActivityRecords } = useRecord();
 
     // ✅ Calculate Total Score
     const totalScore = dailyActivityRecords.reduce((sum, record) => {
@@ -22,20 +22,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
         return sum + (isNaN(score) ? 0 : score);
     }, 0);
 
-    // ✅ Find Top 3 Activities
-    const activityCount: Record<string, number> = {};
 
-    dailyActivityRecords.forEach(record => {
-        const activity = record.activity; // Single activity per record
-        if (activity) {
-            activityCount[activity] = (activityCount[activity] || 0) + 1;
-        }
-    });
-
-    const topActivities = Object.entries(activityCount)
-        .sort((a, b) => b[1] - a[1]) // Sort by occurrence count (descending)
-        .slice(0, 3) // Get top 3
-        .map(([activity, count]) => `${activity} (${count})`); // Format output
 
     return (
         <div className="w-full md:w-1/2 mx-auto">
@@ -45,7 +32,6 @@ const Layout = ({ children }: { children: ReactNode }) => {
                 empId={user?.employeeId}
                 username={user?.username}
                 score={totalScore}
-                activities={topActivities} loading={loading}
             />
             {children}
         </div>

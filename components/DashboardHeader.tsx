@@ -2,7 +2,7 @@
 
 import React, {useState, useEffect} from "react";
 import {animate, motion, useMotionValue, useTransform} from "framer-motion";
-import {LogOut, Eye, EyeOff, LayoutDashboard, Trophy, Award} from "lucide-react";
+import {LogOut, Eye, EyeOff, LayoutDashboard} from "lucide-react";
 import {Button} from "@heroui/button";
 import {Modal, ModalBody, ModalContent, ModalFooter, ModalHeader} from "@heroui/react";
 import Image from "next/image";
@@ -14,10 +14,8 @@ interface DashboardHeaderProps {
     username?: string;
     empId?: string | number;
     score?: number | string;
-    activities?: string[];
     handleLogout: () => void;
     handleScoreDetails: () => void;
-    loading: boolean;
 }
 
 const AnimatedNumber = ({value}: { value: number }) => {
@@ -37,8 +35,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                                                              username = "User",
                                                              empId,
                                                              score = 0,
-                                                             activities,
-                                                             loading,
                                                              handleLogout,
                                                              handleScoreDetails,
                                                          }) => {
@@ -101,9 +97,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                             <div>
                                 <div className="text-xl font-bold text-secondary">Asslam u alikum,</div>
                                 <div className="text-2xl font-extrabold text-primary-500">{username}</div>
-                                <div className="text-lg font-semibold text-gray-300">
-                                    Score: <AnimatedNumber value={Number(score)}/>
-                                </div>
                             </div>
 
                         </div>
@@ -115,48 +108,11 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
                     <Divider/>
 
-                    <div className={'flex items-center justify-between w-full '}>
 
-                        <div className="flex flex-col items-center space-y-3 w-full">
-                            {loading ? <div className="flex flex-col items-center space-y-3 w-full">
-
-                                <Skeleton className={'w-full h-10 rounded-full'}/>
-                                <Skeleton className={'w-full h-10 rounded-full scale-90'}/>
-                                <Skeleton className={'w-full h-10 rounded-full scale-80'}/>
-                            </div> : activities?.map((activity, index) => {
-                                // Rank-specific styles
-                                const rankStyles = [
-                                    "bg-yellow-500/30 border-yellow-400 text-yellow-200 shadow-yellow-500/40", // 🥇 Gold
-                                    "bg-gray-500/30 border-gray-400 text-gray-200 shadow-gray-500/40", // 🥈 Silver
-                                    "bg-orange-500/30 border-orange-400 text-orange-200 shadow-orange-500/40", // 🥉 Bronze
-                                ];
-
-                                return (
-                                    <div
-                                        key={index}
-                                        className={`relative w-full px-6 py-2 rounded-full border backdrop-blur-lg text-center font-semibold flex items-center transition-all duration-300 transform
-          
-          ${rankStyles[index] || "bg-white/10 border-gray-600 text-gray-300 shadow-gray-700/30"}
-          ${index === 0 ? "scale-100 text-lg" : index === activities.length - 1 ? "scale-80" : "scale-90"}`}
-                                        style={{
-                                            boxShadow: "inset 2px 2px 8px rgba(255,255,255,0.1), 3px 3px 10px rgba(0,0,0,0.3)",
-                                        }}
-                                    >
-                                        <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                                            {index < 3 ? (
-                                                <Trophy className="w-6 h-6" strokeWidth={2}/>
-                                            ) : (
-                                                <Award className="w-6 h-6" strokeWidth={2}/>
-                                            )}
-                                        </div>
-                                        <span className="ml-8 whitespace-nowrap">{index + 1}. {activity}</span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-
+                    <div className="text-lg font-semibold text-gray-300 ">
+                        Score: <AnimatedNumber value={Number(score)}/>
                     </div>
+
 
                     <Divider/>
 
