@@ -1,5 +1,4 @@
 import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -42,7 +41,6 @@ const checkRecordsAndNotify = async (): Promise<void> => {
 };
 
 // Function to send push notifications
-// Function to send push notifications
 const sendReminderNotification = async (tokens: string[]): Promise<void> => {
     const message = {
         notification: {
@@ -61,11 +59,3 @@ const sendReminderNotification = async (tokens: string[]): Promise<void> => {
         console.error('Error sending notifications:', error);
     }
 };
-
-export const scheduledNotification = functions.pubsub
-    //@ts-ignore
-    .schedule('every day 17:00')
-    .timeZone('Asia/Karachi') // Adjust to your timezone
-    .onRun(async () => {
-        await checkRecordsAndNotify();
-    });
