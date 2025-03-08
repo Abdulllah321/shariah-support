@@ -11,7 +11,7 @@ const isWeekend = (): boolean => {
 };
 
 // Function to check records and send notifications
-const checkRecordsAndNotify = async (): Promise<void> => {
+export const checkRecordsAndNotify = async (): Promise<void> => {
     if (isWeekend()) {
         console.log('Skipping notification (Weekend)');
         return;
