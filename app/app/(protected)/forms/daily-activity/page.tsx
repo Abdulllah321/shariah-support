@@ -31,14 +31,14 @@ const Page = () => {
             setFetching(true);
             fetchDailyActivityById(id)
                 .then((result) => {
-                    if (result) { // ✅ ID ملنے پر ڈیٹا سیٹ کریں
+                    if (result) {
                         setFormData(result);
                     }
                 })
                 .catch((error) => console.error("Error fetching activity:", error))
                 .finally(() => setFetching(false));
         } else {
-            setFormData({} as dailyActivityType); // ✅ نیا انٹری فارم ریڈی کریں
+            setFormData({} as dailyActivityType); // ✅ Initialize form data
         }
     }, [id, fetchDailyActivityById]);
 
@@ -50,7 +50,7 @@ const Page = () => {
             if (branch) {
                 //@ts-expect-error:@typescript-eslint/ ban-ts-comment
                 setFormData((prev) => ({
-                    ...prev, // Ensure previous state is preserved
+                    ...prev, 
                     branchCode: branch.branchCode,
                     branchName: branch.branchName,
                     city: branch.city,

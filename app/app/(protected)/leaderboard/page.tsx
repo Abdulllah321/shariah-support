@@ -82,8 +82,8 @@ const Page = () => {
 
         // Group & sort logic remains the same
         const groupedData: GroupedRecords = filteredRecords.reduce((acc: GroupedRecords, record) => {
-            const activityType = record.activity || "Unknown";
-            const employeeName = record.name || "Unnamed";
+            const activityType = record.activity?.trim() || "Unknown";
+            const employeeName = record.name?.trim() || "Unnamed";
 
             if (!acc[activityType]) acc[activityType] = {};
             if (!acc[activityType][employeeName]) acc[activityType][employeeName] = 0;
@@ -95,6 +95,8 @@ const Page = () => {
         setGroupedRecords(groupedData);
     };
 
+    console.log(groupedRecords);
+    
     useEffect(() => {
         if (records.length > 0) {
             filterRecords();
@@ -178,7 +180,7 @@ const Page = () => {
                             .sort(([, employeesA], [, employeesB]) =>
                                 Object.values(employeesB).reduce((sum, count) => sum + count, 0) -
                                 Object.values(employeesA).reduce((sum, count) => sum + count, 0)
-                            ) // Sort by total count in descending order
+                            ) 
                             .map(([activityType, employees]) => (
                                 <Tab key={activityType}
                                      title={`${activityType} (${Object.values(employees).reduce((sum, count) => sum + count, 0)})`}/>
@@ -204,7 +206,9 @@ const Page = () => {
                     <div className="space-y-3">
                         {Object.entries(groupedRecords[selected])
                             .sort((a, b) => b[1] - a[1])
-                            .map(([employeeName, count], index) => (
+                            .map(([employeeName, count], index) => {
+                                
+                                return(
                                 <div
                                     key={employeeName}
                                     className={`flex items-center justify-between p-3 rounded-lg transition-all
@@ -228,10 +232,10 @@ const Page = () => {
                                         </span>
                                     </div>
                                     <span className={`text-lg font-semibold ${index === 0 ? "text-xl" : ""}`}>
-                                        {count} times
+                                        {count}
                                     </span>
                                 </div>
-                            ))}
+                            )})}
                     </div>
                 </div>
             )}
