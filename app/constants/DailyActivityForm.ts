@@ -1,5 +1,5 @@
 import {useState, useEffect} from "react";
-import {collection, getDocs, query} from "firebase/firestore";
+import {collection, getDocs, orderBy, query} from "firebase/firestore";
 import {db} from "@/lib/firebase"; // اپنے Firebase کنفیگریشن کا امپورٹ کریں
 
 export interface FormField {
@@ -42,8 +42,19 @@ export const fetchBranches = async (): Promise<{ codes: string[]; names: string[
 // ⬇️ ری یوز ایبل فنکشن جو ایکٹیویٹیز لائے گا
 const fetchActivities = async (): Promise<ActivityType[]> => {
     try {
-        const snapshot = await getDocs(query(collection(db, "activities")));
-        return snapshot.docs.map((doc) => doc.data() as ActivityType);
+        const snapshot = await getDocs(
+            query(collection(db, "activities"), orderBy("order", "asc"))
+        );
+        return snapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                name: data.name,
+                outstationDayTrip: data.outstationDayTrip,
+                outstationLongDistance: data.outstationLongDistance,
+                local: data.local,
+            } as ActivityType;
+        });
     } catch (error) {
         console.error("Error fetching activities:", error);
         return [];
