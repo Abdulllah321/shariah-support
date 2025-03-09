@@ -8,11 +8,15 @@ import {
   doc,
   deleteDoc,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { Button, Drawer, Label, TextInput } from "flowbite-react";
 import Loader from "@/components/Loader";
 import { theme } from "../../scholars/page";
 import { TbActivity } from "react-icons/tb";
+import SortableItem from "@/components/SortableItem";
+import { closestCenter, DndContext } from "@dnd-kit/core";
+import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 const ActivitiesPage = () => {
   const [activities, setActivities] = useState([]);
@@ -32,9 +36,14 @@ const ActivitiesPage = () => {
     setIsLoading(true);
     const querySnapshot = await getDocs(collection(db, "activities"));
     const activitiesList = [];
+
     querySnapshot.forEach((doc) => {
       activitiesList.push({ id: doc.id, ...doc.data() });
     });
+
+    // Sort activities by the `order` field (ascending)
+    activitiesList.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
     setActivities(activitiesList);
     setIsLoading(false);
   };
@@ -76,6 +85,23 @@ const ActivitiesPage = () => {
     }
   };
 
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = activities.findIndex((item) => item.id === active.id);
+    const newIndex = activities.findIndex((item) => item.id === over.id);
+    const newOrder = arrayMove(activities, oldIndex, newIndex);
+
+    setActivities(newOrder);
+
+    // Update order field in Firebase
+    newOrder.forEach(async (item, index) => {
+      const activityRef = doc(db, "activities", item.id);
+      await updateDoc(activityRef, { order: index });
+    });
+  };
+
   return (
     <div className="mx-auto p-6 ">
       <h1 className="text-3xl font-semibold text-gray-800 mb-6">
@@ -104,70 +130,82 @@ const ActivitiesPage = () => {
         <Loader />
       ) : (
         <div className="mt-6 bg-white shadow rounded-lg mx-auto w-full">
-          <table className="w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Local
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Outstation Day Trip
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Outstation Long Distance
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {activities.length ? (
-                activities.map((activity) => (
-                  <tr key={activity.id}>
-                    <td className="px-6 py-4">{activity.name}</td>
-                    <td className="px-6 py-4 text-right">{activity.local}</td>
-                    <td className="px-6 py-4 text-right">
-                      {activity.outstationDayTrip}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      {activity.outstationLongDistance}
-                    </td>
-                    <td className="px-6 py-4 flex space-x-4">
-                      <Button
-                        onClick={() => {
-                          setSelectedActivity(activity);
-                          setNewActivity(activity);
-                          setShowDrawer(true);
-                        }}
-                        className="bg-teal-600 text-white"
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setSelectedActivity(activity.id); // Set the selected scholar for deletion
-                          setShowModal(true); // Open delete confirmation modal
-                        }}
-                        className="bg-red-600 text-white"
-                      >
-                        Delete
-                      </Button>
-                    </td>
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={activities}
+              strategy={verticalListSortingStrategy}
+            >
+              <table className="w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Local
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Outstation Day Trip
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Outstation Long Distance
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="text-center py-4">
-                    No activities found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {activities.length ? (
+                    activities.map((activity, index) => (
+                      <SortableItem key={activity.id} id={activity.id}>
+                        <td className="px-6 py-4">{activity.name}</td>
+                        <td className="px-6 py-4 text-right">
+                          {activity.local}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {activity.outstationDayTrip}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {activity.outstationLongDistance}
+                        </td>
+                        <td className="px-6 py-4 flex space-x-4">
+                          <Button
+                            onClick={() => {
+                              setSelectedActivity(activity);
+                              setNewActivity(activity);
+                              setShowDrawer(true);
+                            }}
+                            className="bg-teal-600 text-white"
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setSelectedActivity(activity.id); // Set the selected scholar for deletion
+                              setShowModal(true); // Open delete confirmation modal
+                            }}
+                            className="bg-red-600 text-white"
+                          >
+                            Delete
+                          </Button>
+                        </td>
+                      </SortableItem>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5" className="text-center py-4">
+                        No activities found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </SortableContext>
+          </DndContext>
         </div>
       )}
 

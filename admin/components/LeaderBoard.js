@@ -18,6 +18,28 @@ const Page = () => {
   const [selectedRegion, setSelectedRegion] = useState("overall");
   const [availableMonths, setAvailableMonths] = useState([]);
   const [records, setRecords] = useState([]);
+  const [scholars, setScholars] = useState({}); // EmployeeID → Name mapping
+
+  useEffect(() => {
+    const fetchScholars = async () => {
+      try {
+        const scholarsQuery = query(collection(db, "scholars"));
+        const querySnapshot = await getDocs(scholarsQuery);
+
+        const scholarMap = {};
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          scholarMap[data.employeeId] = data.name; // Store employeeId → name mapping
+        });
+
+        setScholars(scholarMap);
+      } catch (error) {
+        console.error("Error fetching scholars:", error);
+      }
+    };
+
+    fetchScholars();
+  }, []);
 
   useEffect(() => {
     const fetchRecords = async () => {
@@ -88,8 +110,8 @@ const Page = () => {
     }
 
     const groupedData = filteredRecords.reduce((acc, record) => {
-      let activityType = record.activity?.trim() || "Other Activity";
-      const employeeName = record.name?.trim() || "Unnamed";
+      const activityType = record.activity?.trim() || "Other Activity";
+      const employeeName = record.employeeId?.trim() || "Unnamed";
 
       if (!acc[activityType]) acc[activityType] = {};
       if (!acc[activityType][employeeName]) acc[activityType][employeeName] = 0;
@@ -180,7 +202,10 @@ const Page = () => {
           {Object.entries(groupedRecords)
             .sort(
               ([, employeesA], [, employeesB]) =>
-                Object.values(employeesB).reduce((sum, count) => sum + count, 0) -
+                Object.values(employeesB).reduce(
+                  (sum, count) => sum + count,
+                  0
+                ) -
                 Object.values(employeesA).reduce((sum, count) => sum + count, 0)
             )
             .map(([activityType, employees]) => (
@@ -219,11 +244,18 @@ const Page = () => {
             <div className="space-y-3">
               {Object.entries(groupedRecords[selected])
                 .sort((a, b) => b[1] - a[1])
-                .map(([employeeName, count], index) => (
-                  <div key={employeeName} className="p-3 bg-gray-100 rounded-lg">
-                    <span>#{index + 1} {employeeName} - {count}</span>
+                .map(([employeeId, count], index) => {
+                  const employeeName = scholars[employeeId] || "Unnamed";
+                  return(
+                  <div
+                    key={employeeId}
+                    className="p-3 bg-gray-100 rounded-lg"
+                  >
+                    <span>
+                      #{index + 1} {employeeName} - {count}
+                    </span>
                   </div>
-                ))}
+                )})}
             </div>
           </div>
         )

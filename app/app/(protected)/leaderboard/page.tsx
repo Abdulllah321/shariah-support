@@ -13,6 +13,12 @@ type GroupedRecords = {
     };
 };
 
+
+type Scholar = {
+    employeeId: string;
+    name: string;
+};
+
 const Page = () => {
     const [groupedRecords, setGroupedRecords] = useState<GroupedRecords>({});
     const [loading, setLoading] = useState<boolean>(true);
@@ -20,7 +26,30 @@ const Page = () => {
     const [selectedMonth, setSelectedMonth] = useState<string>("overall");
     const [availableMonths, setAvailableMonths] = useState<string[]>([]);
     const [records, setRecords] = useState<dailyActivityType[]>([]);
+    const [scholars, setScholars] = useState<Record<string, string>>({}); // EmployeeID → Name mapping
     const tabsRef = useRef<HTMLDivElement>(null);
+
+      // Fetch scholars from Firestore
+      useEffect(() => {
+        const fetchScholars = async () => {
+            try {
+                const scholarsQuery = query(collection(db, "scholars"));
+                const querySnapshot = await getDocs(scholarsQuery);
+
+                const scholarMap: Record<string, string> = {};
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data() as Scholar;
+                    scholarMap[data.employeeId] = data.name; // Store employeeId → name mapping
+                });
+
+                setScholars(scholarMap);
+            } catch (error) {
+                console.error("Error fetching scholars:", error);
+            }
+        };
+
+        fetchScholars();
+    }, []);
 
     useEffect(() => {
         const fetchRecords = async () => {
@@ -82,8 +111,8 @@ const Page = () => {
 
         // Group & sort logic remains the same
         const groupedData: GroupedRecords = filteredRecords.reduce((acc: GroupedRecords, record) => {
-            const activityType = record.activity?.trim() || "Unknown";
-            const employeeName = record.name?.trim() || "Unnamed";
+            const activityType = record.activity?.trim() || "Other Activity";
+            const employeeName = record.employeeId?.trim() || "Unnamed";
 
             if (!acc[activityType]) acc[activityType] = {};
             if (!acc[activityType][employeeName]) acc[activityType][employeeName] = 0;
@@ -93,15 +122,13 @@ const Page = () => {
         }, {});
 
         setGroupedRecords(groupedData);
-    };
-
-    console.log(groupedRecords);
-    
+    };    
+ 
     useEffect(() => {
-        if (records.length > 0) {
+        if (records.length > 0 && Object.keys(scholars).length > 0) {
             filterRecords();
         }
-    }, [records, selectedMonth]);
+    }, [records, scholars, selectedMonth]);
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!tabsRef.current) return;
@@ -122,6 +149,8 @@ const Page = () => {
         document.addEventListener("mousemove", handleMouseMove);
         document.addEventListener("mouseup", handleMouseUp);
     };
+
+    console.log(scholars)
 
     return (
         <div className="p-6">
@@ -206,11 +235,13 @@ const Page = () => {
                     <div className="space-y-3">
                         {Object.entries(groupedRecords[selected])
                             .sort((a, b) => b[1] - a[1])
-                            .map(([employeeName, count], index) => {
-                                
+                            .map(([employeeId, count], index) => {
+                                const employeeName = scholars.hasOwnProperty(employeeId)
+                                    ? scholars[employeeId]
+                                    : "Unnamed";
                                 return(
                                 <div
-                                    key={employeeName}
+                                    key={employeeId}
                                     className={`flex items-center justify-between p-3 rounded-lg transition-all
                                         ${
                                         index === 0
