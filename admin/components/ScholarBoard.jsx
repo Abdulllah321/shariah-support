@@ -126,12 +126,11 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
     .sort((a, b) => b[1] - a[1]) // Sort by count in descending order
     .slice(0, isShowMore ? undefined : 3) // Limit to top 3 unless isShowMore is true
     .sort((a, b) => {
-      const orderA =
-        activities.find((act) => act.name === a[0])?.order ?? Infinity;
-      const orderB =
-        activities.find((act) => act.name === b[0])?.order ?? Infinity;
-      return orderA - orderB; // Sort by predefined order
-    })
+      const orderA = activities.find((act) => act.name === a[0])?.order ?? Infinity;
+      const orderB = activities.find((act) => act.name === b[0])?.order ?? Infinity;
+    
+      return orderA - orderB; // Sort by predefined order only
+    })    
     .map(([activity, count]) => `${activity} (${count})`);
 
   return (
@@ -175,7 +174,7 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
             }`}
             onClick={() => setActiveTab("chart")}
           >
-            Chart
+            Trend
           </button>
         </div>
       </div>

@@ -1,6 +1,12 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import { db } from "@/firebase";
 import { Label } from "flowbite-react";
 import { format, parseISO } from "date-fns";
@@ -19,7 +25,8 @@ const Page = () => {
   const [selectedRegion, setSelectedRegion] = useState("overall");
   const [availableMonths, setAvailableMonths] = useState([]);
   const [records, setRecords] = useState([]);
-  const [scholars, setScholars] = useState({}); // EmployeeID → Name mapping
+  const [scholars, setScholars] = useState({});
+  const [activities, setActivities] = useState([]);
 
   useEffect(() => {
     const fetchScholars = async () => {
@@ -40,6 +47,19 @@ const Page = () => {
     };
 
     fetchScholars();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "activities"), (snapshot) => {
+      const activitiesData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setActivities(activitiesData);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -131,7 +151,10 @@ const Page = () => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-lg h-full">
+    <div
+      className="flex flex-col items-center w-full p-6 rounded-2xl border shadow-lg backdrop-blur-md relative h-max
+          bg-white dark:bg-gray-900/50 border-gray-300 dark:border-gray-700 shadow-gray-400 dark:shadow-gray-800 transition-all duration-500"
+    >
       <div className="mb-4 flex justify-between">
         {loading ? (
           <Skeleton className="h-10 w-32 rounded-lg" />
@@ -241,30 +264,36 @@ const Page = () => {
             slidesPerView="auto"
             spaceBetween={30}
             freeMode={true}
-            navigation={{ prevEl: "#swiper-prev-lead", nextEl: "#swiper-next-lead" }}
+            navigation={{
+              prevEl: "#swiper-prev-lead",
+              nextEl: "#swiper-next-lead",
+            }}
             modules={[FreeMode, Navigation]}
             className="w-full"
             slidesOffsetBefore={40} // Space before the first slide
             slidesOffsetAfter={40} // Space after the last slide
           >
             {Object.entries(groupedRecords)
-              .sort(
-                ([, employeesA], [, employeesB]) =>
-                  Object.values(employeesB).reduce(
-                    (sum, count) => sum + count,
-                    0
-                  ) -
-                  Object.values(employeesA).reduce(
-                    (sum, count) => sum + count,
-                    0
-                  )
-              )
+              .sort((a, b) => {
+                const orderA =
+                  activities.find((act) => act.name === a[0])?.order ??
+                  Infinity;
+                const orderB =
+                  activities.find((act) => act.name === b[0])?.order ??
+                  Infinity;
+
+                return orderA - orderB; // Sort by predefined order only
+              })
               .map(([activityType, employees]) => (
                 <SwiperSlide
                   key={activityType}
                   onClick={() => setSelected(activityType)}
                   className={`flex flex-col items-center justify-center px-4 py-2 text-center rounded-lg border border-gray-300 shadow-lg !w-max cursor-pointer transition-all
-                   ${selected === activityType ? "!bg-blue-500 text-white" : "bg-gray-100"}`}
+                          ${
+                            selected === activityType
+                              ? "!bg-blue-500 text-white"
+                              : "bg-gray-100"
+                          }`}
                 >
                   {`${activityType} (${Object.values(employees).reduce(
                     (sum, count) => sum + count,
@@ -293,22 +322,40 @@ const Page = () => {
       ) : (
         selected &&
         groupedRecords[selected] && (
-          <div className="mt-6 p-4 bg-white rounded-xl shadow-lg">
-            <h2 className="text-2xl font-bold mb-4 text-center">
+          <div className="mt-4">
+            <h2 className="text-xl font-bold mb-4 text-center text-gray-800">
               {selected} Activity Leaderboard
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {Object.entries(groupedRecords[selected])
                 .sort((a, b) => b[1] - a[1])
                 .map(([employeeId, count], index) => {
                   const employeeName = scholars[employeeId] || "Unnamed";
+
+                  // Define styles for the top 3 positions
+                  const rankStyles = [
+                    "bg-yellow-500 text-white", // 🥇 Gold
+                    "bg-gray-400 text-white", // 🥈 Silver
+                    "bg-orange-400 text-white", // 🥉 Bronze
+                  ];
+
                   return (
                     <div
                       key={employeeId}
-                      className="p-3 bg-gray-100 rounded-lg"
+                      className={`p-2 rounded-lg flex items-center justify-between text-sm font-semibold
+                      transition-all duration-300 ${
+                        index < 3
+                          ? rankStyles[index] + " shadow-md"
+                          : "bg-white border border-gray-300 shadow-sm"
+                      }`}
                     >
-                      <span>
-                        #{index + 1} {employeeName} - {count}
+                      <span className="flex items-center gap-2">
+                        {index === 0 && "🥇"}
+                        {index === 1 && "🥈"}
+                        {index === 2 && "🥉"}#{index + 1} {employeeName}
+                      </span>
+                      <span className="font-bold text-gray-700">
+                        {count} pts
                       </span>
                     </div>
                   );
