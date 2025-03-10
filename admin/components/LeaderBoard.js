@@ -303,7 +303,7 @@ const Page = () => {
                         {index === 2 && "🥉"}#{index + 1} {employeeName}
                       </span>
                       <span className="font-bold text-gray-700">
-                        {count} pts
+                        {count} 
                       </span>
                     </div>
                   );
