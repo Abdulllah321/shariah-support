@@ -234,25 +234,14 @@ const Page = () => {
               <SelectValue placeholder="Select an Activity" />
             </SelectTrigger>
             <SelectContent>
-              {Object.keys(groupedRecords)
-                .sort((a, b) => {
-                  const orderA =
-                    activities.find((act) => act.name.trim() === a.trim())
-                      ?.order ?? Infinity;
-                  const orderB =
-                    activities.find((act) => act.name.trim() === b.trim())
-                      ?.order ?? Infinity;
-                  return orderA - orderB;
-                })
-                .map((activityType) => {
-                  const trimmedActivityType = activityType.trim();
+              {activities
+                .filter((act) => groupedRecords[act.name.trim()] !== undefined) // Sirf woh activities jo groupedRecords mein hain
+                .map((act) => {
+                  const activityType = act.name.trim();
                   return (
-                    <SelectItem
-                      key={trimmedActivityType}
-                      value={trimmedActivityType}
-                    >
-                      {`${trimmedActivityType} (${Object.values(
-                        groupedRecords[trimmedActivityType]
+                    <SelectItem key={activityType} value={activityType}>
+                      {`${activityType} (${Object.values(
+                        groupedRecords[activityType]
                       ).reduce((sum, count) => sum + count, 0)})`}
                     </SelectItem>
                   );
@@ -302,9 +291,7 @@ const Page = () => {
                         {index === 1 && "🥈"}
                         {index === 2 && "🥉"}#{index + 1} {employeeName}
                       </span>
-                      <span className="font-bold text-gray-700">
-                        {count} 
-                      </span>
+                      <span className="font-bold text-gray-700">{count}</span>
                     </div>
                   );
                 })}

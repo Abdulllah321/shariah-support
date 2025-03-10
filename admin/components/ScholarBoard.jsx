@@ -1,5 +1,5 @@
 import { db } from "@/firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Award,
@@ -48,15 +48,17 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "activities"), (snapshot) => {
+    const activitiesQuery = query(collection(db, "activities"), orderBy("order", "asc"));
+  
+    const unsubscribe = onSnapshot(activitiesQuery, (snapshot) => {
       const activitiesData = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-
+  
       setActivities(activitiesData);
     });
-
+  
     return () => unsubscribe();
   }, []);
 
@@ -121,19 +123,11 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
       activityCount[activity] = (activityCount[activity] || 0) + 1;
     }
   });
+  const topActivities = activities
+  .filter((act) => activityCount[act.name] !== undefined) // Sirf woh activities lo jo activityCount mein hain
+  .slice(0, isShowMore ? undefined : 3) // Pehlay 3 ya sab (isShowMore ke mutabiq)
+  .map((act) => `${act.name} (${activityCount[act.name]})`);
 
-  const topActivities = Object.entries(activityCount)
-    .sort((a, b) => b[1] - a[1]) // Sort by count in descending order
-    .slice(0, isShowMore ? undefined : 3) // Limit to top 3 unless isShowMore is true
-    .sort((a, b) => {
-      const orderA =
-        activities.find((act) => act.name === a[0])?.order ?? Infinity;
-      const orderB =
-        activities.find((act) => act.name === b[0])?.order ?? Infinity;
-
-      return orderA - orderB; // Sort by predefined order only
-    })
-    .map(([activity, count]) => `${activity} (${count})`);
 
   return (
     <div
@@ -200,7 +194,7 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
 
       {activeTab === "chart" ? (
         <>
-          <h2 className="text-xl font-semibold mb-4">Scholar Activity Distribution</h2>
+          <h2 className="text-xl font-semibold mb-4">{scholars.find((scholar) => scholar.employeeId === selectedScholar).name} Activity Distribution</h2>
           {chartData ? (
             <Bar
               data={chartData}
@@ -270,9 +264,8 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
         <>
           {/* Title */}
           <h2 className="text-xl font-bold flex items-center gap-2 text-gray-800 dark:text-white">
-            🏆{" "}
             {selectedScholar
-              ? "Selected Scholar's Activities"
+              ? `${scholars.find((scholar) => scholar.employeeId === selectedScholar).name} Activities Distribution`
               : "Top Activities Leaderboard"}
           </h2>
 

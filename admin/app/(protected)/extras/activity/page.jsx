@@ -9,6 +9,7 @@ import {
   deleteDoc,
   setDoc,
   updateDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { Button, Drawer, Label, TextInput } from "flowbite-react";
 import Loader from "@/components/Loader";
@@ -85,22 +86,28 @@ const ActivitiesPage = () => {
     }
   };
 
+
   const handleDragEnd = async (event) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-
+  
     const oldIndex = activities.findIndex((item) => item.id === active.id);
     const newIndex = activities.findIndex((item) => item.id === over.id);
     const newOrder = arrayMove(activities, oldIndex, newIndex);
-
+  
     setActivities(newOrder);
-
-    // Update order field in Firebase
-    newOrder.forEach(async (item, index) => {
+  
+    // Use batch update for better performance
+    const batch = writeBatch(db);
+  
+    newOrder.forEach((item, index) => {
       const activityRef = doc(db, "activities", item.id);
-      await updateDoc(activityRef, { order: index });
+      batch.update(activityRef, { order: index });
     });
+  
+    await batch.commit(); // Execute batch update
   };
+  
 
   return (
     <div className="mx-auto p-6 ">

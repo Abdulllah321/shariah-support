@@ -134,18 +134,7 @@ function AdminSidebar({ children }) {
     }
   };
 
-  useEffect(() => {
-    const element = document.querySelector(".h-full.overflow-hidden");
-    if (element) {
-      const elementTop = element.getBoundingClientRect().top; // Distance from top of viewport
-      const elementHeight = element.clientHeight; // Height of element
-      const viewportHeight = window.innerHeight; // Total viewport height (100vh)
 
-      console.log("Element Distance from Top:", elementTop);
-      console.log("Element Height:", elementHeight);
-      console.log("Remaining Space:", viewportHeight - elementTop);
-    }
-  }, []);
 
   return (
     <>
