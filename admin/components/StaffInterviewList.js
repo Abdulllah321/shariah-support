@@ -10,6 +10,7 @@ import {
   FaIdCard,
   FaTag,
   FaRegCalendar,
+  FaRegMap,
 } from "react-icons/fa";
 
 const formatDate = (date) => {
