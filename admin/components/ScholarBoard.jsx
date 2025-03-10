@@ -18,10 +18,10 @@ import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import { Bar } from "react-chartjs-2";
 
-
 const ScholarBoard = ({ dailyActivityRecords }) => {
   const [isShowMore, setIsShowMore] = useState(false);
   const [scholars, setScholars] = useState([]);
+  const [activities, setActivities] = useState([]);
   const [selectedScholar, setSelectedScholar] = useState(null);
   const [chartData, setChartData] = useState(null);
   const [activeTab, setActiveTab] = useState("list");
@@ -38,12 +38,27 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
 
       setScholars(scholarData);
       if (scholarData.length > 0) {
-        setSelectedScholar(scholarData[0].employeeId); // Set first scholar as default
+        setSelectedScholar(scholarData[0].employeeId);
       }
     });
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "activities"), (snapshot) => {
+      const activitiesData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setActivities(activitiesData);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  console.log(activities);
 
   useEffect(() => {
     if (!isShowMore && sectionRef.current) {
@@ -54,7 +69,6 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
   useEffect(() => {
     if (scholars.length === 0) return;
 
-    // Filter activities based on selected scholar
     const filteredRecords = selectedScholar
       ? dailyActivityRecords?.filter(
           (record) => record.employeeId?.trim() === selectedScholar
@@ -62,10 +76,7 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
       : dailyActivityRecords;
 
     // Count activities
-    let totalScore = 0;
-    const monthlyData = {};
-    const uniqueMonths = new Set();
-    const activityFrequency = {};    filteredRecords?.forEach((record) => {
+    filteredRecords?.forEach((record) => {
       const activity = record.activity;
       if (activity) {
         activityCount[activity] = (activityCount[activity] || 0) + 1;
@@ -79,11 +90,8 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
       const recordMonth = dayjs(data.date).format("YYYY-MM");
       // Aggregate activity counts
       categoryMap[activityType] = (categoryMap[activityType] || 0) + 1;
-
-      // // Count most frequent activity
-      // activityFrequency[activityType] =
-      //   (activityFrequency[activityType] || 0) + 1;
     });
+
     setChartData({
       labels: Object.keys(categoryMap),
       datasets: [
@@ -95,9 +103,6 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
         },
       ],
     });
-
-    console.log(categoryMap);
-    
 
     setLoading(false);
   }, [dailyActivityRecords, selectedScholar, scholars]);
@@ -118,8 +123,15 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
   });
 
   const topActivities = Object.entries(activityCount)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, isShowMore ? undefined : 3)
+    .sort((a, b) => b[1] - a[1]) // Sort by count in descending order
+    .slice(0, isShowMore ? undefined : 3) // Limit to top 3 unless isShowMore is true
+    .sort((a, b) => {
+      const orderA =
+        activities.find((act) => act.name === a[0])?.order ?? Infinity;
+      const orderB =
+        activities.find((act) => act.name === b[0])?.order ?? Infinity;
+      return orderA - orderB; // Sort by predefined order
+    })
     .map(([activity, count]) => `${activity} (${count})`);
 
   return (

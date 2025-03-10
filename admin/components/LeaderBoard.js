@@ -264,7 +264,7 @@ const Page = () => {
                   key={activityType}
                   onClick={() => setSelected(activityType)}
                   className={`flex flex-col items-center justify-center px-4 py-2 text-center rounded-lg border border-gray-300 shadow-lg !w-max cursor-pointer transition-all
-     ${selected === activityType ? "!bg-blue-500 text-white" : "bg-gray-100"}`}
+                   ${selected === activityType ? "!bg-blue-500 text-white" : "bg-gray-100"}`}
                 >
                   {`${activityType} (${Object.values(employees).reduce(
                     (sum, count) => sum + count,
