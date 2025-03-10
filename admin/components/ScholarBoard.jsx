@@ -3,12 +3,18 @@ import { Skeleton } from "@heroui/skeleton";
 import { collection, onSnapshot } from "firebase/firestore";
 import { Button } from "flowbite-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Award, ChevronDown, Trophy } from "lucide-react";
+import {
+  Award,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Trophy,
+} from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/free-mode";
-import { FreeMode } from "swiper/modules";
+import { FreeMode, Navigation } from "swiper/modules";
 import { useRouter } from "next/navigation";
 
 const ScholarBoard = ({ dailyActivityRecords }) => {
@@ -16,7 +22,7 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
   const [scholars, setScholars] = useState([]);
   const [selectedScholar, setSelectedScholar] = useState(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter()
+  const router = useRouter();
   const sectionRef = useRef(null);
 
   useEffect(() => {
@@ -90,24 +96,35 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
           bg-white dark:bg-gray-900/50 border-gray-300 dark:border-gray-700 shadow-gray-400 dark:shadow-gray-800 transition-all duration-500
           ${isShowMore ? "max-h-[1200px]" : "max-h-[450px]"}`}
     >
-      <div className="w-full mb-10">
+      <div className="relative w-full mb-10">
+        {/* Left Arrow */}
+        <button
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/50 backdrop-blur-sm shadow-md p-2 -ml-6 rounded-full border border-gray-300 hover:bg-gray-200 transition"
+          id="swiper-prev-scholar"
+        >
+          <ChevronLeft className="w-6 h-6 text-gray-700" />
+        </button>
+
         <Swiper
           slidesPerView="auto"
           spaceBetween={30}
           freeMode={true}
-          modules={[FreeMode]}
-          className="w-full"
+          navigation={{ prevEl: "#swiper-prev-scholar", nextEl: "#swiper-next-scholar" }}
+          modules={[FreeMode, Navigation]}
+          className="w-full "
+          slidesOffsetBefore={40} // Space before the first slide
+          slidesOffsetAfter={40} // Space after the last slide
         >
           {scholars.map((scholar) => (
             <SwiperSlide
               key={scholar.employeeId}
               onClick={() => setSelectedScholar(scholar.employeeId)}
               className={`flex flex-col items-center justify-center px-4 py-2 text-center rounded-lg border border-gray-300 shadow-lg bg-white !w-max cursor-pointer transition-all
-            ${
-              selectedScholar === scholar.employeeId
-                ? "!bg-teal-500 !text-white !border-teal-700 shadow-md"
-                : ""
-            }`}
+          ${
+            selectedScholar === scholar.employeeId
+              ? "!bg-teal-500 !text-white !border-teal-700 shadow-md"
+              : ""
+          }`}
             >
               <p className="text-lg font-semibold whitespace-nowrap">
                 {scholar.name}
@@ -115,6 +132,14 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
             </SwiperSlide>
           ))}
         </Swiper>
+
+        {/* Right Arrow */}
+        <button
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/50 backdrop-blur-sm -mr-6 shadow-md p-2 rounded-full border border-gray-300 hover:bg-gray-200 transition"
+          id="swiper-next-scholar"
+        >
+          <ChevronRight className="w-6 h-6 text-gray-700" />
+        </button>
       </div>
 
       {/* Title */}
@@ -170,7 +195,13 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
                     boxShadow:
                       "inset 2px 2px 6px rgba(0,0,0,0.05), 3px 3px 10px rgba(0,0,0,0.1)",
                   }}
-                  onClick={() => router.push(`/reports/daily?scholar=${selectedScholar}&activity=${activity.split(" (")[0]}`)}
+                  onClick={() =>
+                    router.push(
+                      `/reports/daily?scholar=${selectedScholar}&activity=${
+                        activity.split(" (")[0]
+                      }`
+                    )
+                  }
                 >
                   <div className="absolute left-3 top-1/2 -translate-y-1/2">
                     {index < 3 ? (
@@ -199,8 +230,8 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
         </p>
       )}
 
-            {/* Show More Button */}
-            {filteredRecords.length > 33 && (
+      {/* Show More Button */}
+      {filteredRecords.length > 33 && (
         <div className="w-full h-20 bg-gradient-to-t from-gray-300 dark:from-gray-600/50 rounded-b-md to-transparent z-20 absolute bottom-0">
           <div
             className="flex items-center justify-center w-full h-24 bg-transparent"

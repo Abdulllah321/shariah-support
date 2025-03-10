@@ -8,7 +8,8 @@ import { Skeleton } from "@heroui/skeleton";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/free-mode";
-import { FreeMode } from "swiper/modules";
+import { FreeMode, Navigation } from "swiper/modules";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Page = () => {
   const [groupedRecords, setGroupedRecords] = useState({});
@@ -192,40 +193,95 @@ const Page = () => {
       ) : Object.keys(groupedRecords).length === 0 ? (
         <p>No records found.</p>
       ) : (
-        <Swiper
-          slidesPerView="auto"
-          spaceBetween={10}
-          freeMode
-          modules={[FreeMode]}
-          className="p-2"
-        >
-          {Object.entries(groupedRecords)
-            .sort(
-              ([, employeesA], [, employeesB]) =>
-                Object.values(employeesB).reduce(
-                  (sum, count) => sum + count,
-                  0
-                ) -
-                Object.values(employeesA).reduce((sum, count) => sum + count, 0)
-            )
-            .map(([activityType, employees]) => (
-              <SwiperSlide key={activityType} className="!w-max">
-                <button
+        // <Swiper
+        //   slidesPerView="auto"
+        //   spaceBetween={10}
+        //   freeMode
+        //   modules={[FreeMode]}
+        //   className="p-2"
+        // >
+        //   {Object.entries(groupedRecords)
+        //     .sort(
+        //       ([, employeesA], [, employeesB]) =>
+        //         Object.values(employeesB).reduce(
+        //           (sum, count) => sum + count,
+        //           0
+        //         ) -
+        //         Object.values(employeesA).reduce((sum, count) => sum + count, 0)
+        //     )
+        //     .map(([activityType, employees]) => (
+        //       <SwiperSlide key={activityType} className="!w-max">
+        //         <button
+        //           onClick={() => setSelected(activityType)}
+        //           className={`px-4 py-2 rounded-lg border transition-all ${
+        //             selected === activityType
+        //               ? "bg-blue-500 text-white"
+        //               : "bg-gray-100"
+        //           }`}
+        //         >
+        //           {`${activityType} (${Object.values(employees).reduce(
+        //             (sum, count) => sum + count,
+        //             0
+        //           )})`}
+        //         </button>
+        //       </SwiperSlide>
+        //     ))}
+        // </Swiper>
+
+        <div className="relative w-full mb-10">
+          {/* Left Arrow */}
+          <button
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 -ml-4 bg-white/50 backdrop-blur-sm shadow-md p-2 rounded-full border border-gray-300 hover:bg-gray-200 transition"
+            id="swiper-prev-lead"
+          >
+            <ChevronLeft className="w-6 h-6 text-gray-700" />
+          </button>
+
+          <Swiper
+            slidesPerView="auto"
+            spaceBetween={30}
+            freeMode={true}
+            navigation={{ prevEl: "#swiper-prev-lead", nextEl: "#swiper-next-lead" }}
+            modules={[FreeMode, Navigation]}
+            className="w-full"
+            slidesOffsetBefore={40} // Space before the first slide
+            slidesOffsetAfter={40} // Space after the last slide
+          >
+            {Object.entries(groupedRecords)
+              .sort(
+                ([, employeesA], [, employeesB]) =>
+                  Object.values(employeesB).reduce(
+                    (sum, count) => sum + count,
+                    0
+                  ) -
+                  Object.values(employeesA).reduce(
+                    (sum, count) => sum + count,
+                    0
+                  )
+              )
+              .map(([activityType, employees]) => (
+                <SwiperSlide
+                  key={activityType}
                   onClick={() => setSelected(activityType)}
-                  className={`px-4 py-2 rounded-lg border transition-all ${
-                    selected === activityType
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-100"
-                  }`}
+                  className={`flex flex-col items-center justify-center px-4 py-2 text-center rounded-lg border border-gray-300 shadow-lg !w-max cursor-pointer transition-all
+     ${selected === activityType ? "!bg-blue-500 text-white" : "bg-gray-100"}`}
                 >
                   {`${activityType} (${Object.values(employees).reduce(
                     (sum, count) => sum + count,
                     0
                   )})`}
-                </button>
-              </SwiperSlide>
-            ))}
-        </Swiper>
+                </SwiperSlide>
+              ))}
+          </Swiper>
+
+          {/* Right Arrow */}
+          <button
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/50 backdrop-blur-sm -mr-4 shadow-md p-2 rounded-full border border-gray-300 hover:bg-gray-200 transition"
+            id="swiper-next-lead"
+          >
+            <ChevronRight className="w-6 h-6 text-gray-700" />
+          </button>
+        </div>
       )}
 
       {loading ? (
@@ -246,16 +302,17 @@ const Page = () => {
                 .sort((a, b) => b[1] - a[1])
                 .map(([employeeId, count], index) => {
                   const employeeName = scholars[employeeId] || "Unnamed";
-                  return(
-                  <div
-                    key={employeeId}
-                    className="p-3 bg-gray-100 rounded-lg"
-                  >
-                    <span>
-                      #{index + 1} {employeeName} - {count}
-                    </span>
-                  </div>
-                )})}
+                  return (
+                    <div
+                      key={employeeId}
+                      className="p-3 bg-gray-100 rounded-lg"
+                    >
+                      <span>
+                        #{index + 1} {employeeName} - {count}
+                      </span>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         )
