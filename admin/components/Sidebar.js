@@ -159,7 +159,7 @@ function AdminSidebar({ children }) {
           </div>
 
           {/* Sidebar Items */}
-          <div className="h-full overflow-y-auto overflow-x-hidden rounded-t-2xl bg-gray-50 px-3 py-4">
+          <div className="h-full overflow-y-auto overflow-x-hidden rounded-t-2xl bg-gray-50 px-3 py-4 relative top-0">
             <div className="mt-4 space-y-2 border-t border-gray-200 pt-4 first:mt-0 first:border-t-0 first:pt-0">
               {sidebarItems.map((item, index) => {
                 const isParentActive =
