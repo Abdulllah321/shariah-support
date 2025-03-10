@@ -121,78 +121,81 @@ const ScholarsPage = () => {
       {/* Scholars Table */}
       <div className="overflow-hidden bg-white shadow rounded-lg w-full mx-auto">
         {!loading && (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Serial No.
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">
-                  Employee ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {scholars.length ? (
-                scholars.map((scholar, index) => (
-                  <tr key={scholar.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-[10%]">
-                      {index + 1}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {scholar.employeeId}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
-                      {scholar.name}
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex ">
-                      <Button
-                        onClick={() => {
-                          router.push(`/reports/daily?scholar=${scholar.employeeId}`);
-                        }}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        View Reports
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setSelectedScholar(scholar.id); // Set the selected scholar for editing
-                          setNewScholar(scholar.name); // Pre-fill name
-                          setNewEmployeeId(scholar.employeeId); // Pre-fill employee ID
-                          setShowDrawer(true); // Open drawer for editing
-                        }}
-                        className="text-teal-600 hover:text-teal-900 ml-4"
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setSelectedScholar(scholar.id); // Set the selected scholar for deletion
-                          setShowModal(true); // Open delete confirmation modal
-                        }}
-                        className="text-red-600 hover:text-red-900 ml-4"
-                      >
-                        Delete
-                      </Button>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
+                    Serial No.
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]">
+                    Employee ID
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {scholars.length ? (
+                  scholars.map((scholar, index) => (
+                    <tr key={scholar.id} className="text-sm md:text-base">
+                      <td className="px-4 py-3 whitespace-nowrap text-gray-900 w-[10%]">
+                        {index + 1}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-gray-500">
+                        {scholar.employeeId}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-gray-500">
+                        {scholar.name}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap flex flex-col sm:flex-row items-center gap-2">
+                        <Button
+                          onClick={() =>
+                            router.push(
+                              `/reports/daily?scholar=${scholar.employeeId}`
+                            )
+                          }
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          View Reports
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setSelectedScholar(scholar.id);
+                            setNewScholar(scholar.name);
+                            setNewEmployeeId(scholar.employeeId);
+                            setShowDrawer(true);
+                          }}
+                          className="text-teal-600 hover:text-teal-900"
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setSelectedScholar(scholar.id);
+                            setShowModal(true);
+                          }}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          Delete
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr className="text-center">
+                    <td colSpan="4" className="py-6 text-sm text-gray-500">
+                      No scholars found.
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr className="text-center">
-                  <td colSpan="4" className="py-6 text-sm text-gray-500">
-                    No scholars found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 

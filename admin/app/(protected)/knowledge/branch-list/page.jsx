@@ -120,7 +120,7 @@ export default function ProcessFlowUploader() {
     };
 
     return (
-        <div className="p-6 bg-white shadow-2xl rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800 transition-all duration-300">
+        <div className="p-6 bg-white shadow-2xl rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800 transition-all duration-300 h-max">
             <h2 className="text-2xl font-bold mb-6 text-teal-600 text-center">Branches List</h2>
             <div className={'grid md:grid-cols-3 grid-cols-1 gap-10'}>
                 <div>

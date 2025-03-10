@@ -149,20 +149,20 @@ const BranchReviewPage = () => {
         Branch Review Management
       </h1>
 
-      <div className="flex justify-between items-center">
-        <Button
+      <div className="flex flex-wrap justify-center sm:justify-between items-center gap-4">
+      <Button
           onClick={() => {
             setShowDrawer(true);
             setNewBranch({ name: "", review: "" });
             setSelectedBranch(null);
             setBulkUpload(false);
           }}
-          className="bg-teal-600 text-white hover:bg-teal-700"
+          className="bg-teal-600 text-white hover:bg-teal-700 w-full md:w-auto"
         >
           Add New Branch Review Point
         </Button>
 
-        <form className="w-[28rem] mx-auto">
+        <form className="w-[28rem] mx-auto max-w-full">
           <div className="relative">
             <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
               <svg
@@ -198,7 +198,7 @@ const BranchReviewPage = () => {
             setBulkUpload(true);
             setBulkBranchNames("");
           }}
-          className="ml-4 bg-cyan-600 text-white hover:bg-cyan-700"
+          className="md:ml-4 bg-cyan-600 text-white hover:bg-cyan-700 md:w-auto w-full "
         >
           Bulk Upload Branches
         </Button>
@@ -207,7 +207,7 @@ const BranchReviewPage = () => {
       {isLoading ? (
         <Loader />
       ) : (
-        <div className="mt-6 bg-white shadow rounded-lg mx-auto w-full">
+        <div className="mt-6 bg-white shadow rounded-lg mx-auto w-full overflow-x-auto">
           <table className="w-full divide-y divide-gray-200">
             <thead className="bg-gray-950">
               <tr>

@@ -16,7 +16,7 @@ import Link from "next/link";
 import Loader from "@/components/Loader";
 import { useSearchParams } from "next/navigation";
 import { MdDelete, MdVisibility } from "react-icons/md";
-import {Download} from "lucide-react";
+import { Download } from "lucide-react";
 import * as XLSX from "xlsx";
 
 export default function Reports() {
@@ -86,7 +86,6 @@ export default function Reports() {
     }
   };
 
-
   const totalPages = Math.ceil(filteredReports.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
   const currentRows = filteredReports.slice(
@@ -115,19 +114,20 @@ export default function Reports() {
         "Client Cell Number": record.clientCellNumber || "N/A",
         "Client Business Address": record.clientBusinessAddress || "N/A",
         "Client Employer / Business Name":
-            record.clientEmployerBusinessName || "N/A",
+          record.clientEmployerBusinessName || "N/A",
         "Creator Name": record.creator_name || "N/A",
         "Creator Domain": record.creatorId || "N/A",
         "BM Branch Code": record.bmBranchCode || "N/A",
       }));
 
-
       const ws = XLSX.utils.json_to_sheet(formattedData);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "360 Leads Report");
 
-      const excelBuffer = XLSX.write(wb, {bookType: "xlsx", type: "array"});
-      const blob = new Blob([excelBuffer], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
 
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
@@ -151,8 +151,8 @@ export default function Reports() {
       <h1 className="text-3xl font-semibold text-gray-800 mb-6">
         360 Leads Report
       </h1>
-      <div className="flex justify-between items-center mb-4">
-        <form className="w-[28rem]">
+      <div className="flex justify-between md:items-center mb-4 flex-col-reverse md:flex-row gap-2">
+        <form className="w-[28rem] max-w-full">
           <div className="relative">
             <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
               <FiSearch className="w-4 h-4 text-gray-500" />
@@ -167,123 +167,124 @@ export default function Reports() {
           </div>
         </form>
         <Button
-            onClick={handleExportToExcel}
-
-            color={'warning'}
-            className="shadow-secondary bg-teal-800 text-white"
+          onClick={handleExportToExcel}
+          color={"warning"}
+          className="shadow-secondary bg-teal-800 text-white"
         >
-          <Download size={20} className={'mr-2'}/> Export
+          <Download size={20} className={"mr-2"} /> Export
         </Button>
       </div>
 
       <motion.div className="overflow-hidden bg-white shadow-lg rounded-lg">
-        <table className="w-full table-auto border-collapse">
-          <thead className="bg-teal-800 text-white">
-            <tr>
-              <th className="p-3">#</th>
-              {[
-                "Creator Name",
-                "Client Name",
-                "Client Cell No.",
-                "Client Employer / Business Name",
-                "BM Domain",
-              ].map((col) => (
-                <th
-                  key={col}
-                  className="p-3 cursor-pointer"
-                  onClick={() => handleSort(col.toLowerCase())}
-                >
-                  {col}
-                </th>
-              ))}
-              <th className="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentRows.length ? (
-              currentRows.map((report, index) => (
-                <tr
-                  key={report.id}
-                  className="hover:bg-teal-100 odd:bg-gray-50 even:bg-white border-t"
-                >
-                  <td className="p-3">{index + 1}</td>
-                  <td
-                    className={`p-3 ${
-                      report.creator_name
-                        ? "text-gray-800"
-                        : "text-gray-400 italic"
-                    }`}
+        <div className="overflow-x-auto">
+          <table className="w-full table-auto border-collapse">
+            <thead className="bg-teal-800 text-white">
+              <tr>
+                <th className="p-3">#</th>
+                {[
+                  "Creator Name",
+                  "Client Name",
+                  "Client Cell No.",
+                  "Client Employer / Business Name",
+                  "BM Domain",
+                ].map((col) => (
+                  <th
+                    key={col}
+                    className="p-3 cursor-pointer"
+                    onClick={() => handleSort(col.toLowerCase())}
                   >
-                    {report.creator_name || "N/A"}
-                  </td>
-                  <td
-                    className={`p-3 ${
-                      report.clientName
-                        ? "text-gray-800"
-                        : "text-gray-400 italic"
-                    }`}
+                    {col}
+                  </th>
+                ))}
+                <th className="p-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentRows.length ? (
+                currentRows.map((report, index) => (
+                  <tr
+                    key={report.id}
+                    className="hover:bg-teal-100 odd:bg-gray-50 even:bg-white border-t"
                   >
-                    {report.clientName || "N/A"}
-                  </td>
-                  <td
-                    className={`p-3 ${
-                      report.clientCellNumber
-                        ? "text-gray-800"
-                        : "text-gray-400 italic"
-                    }`}
-                  >
-                    {`${report.clientCellCode} ${report.clientCellNumber}` ||
-                      "N/A"}
-                  </td>
-                  <td
-                    className={`p-3 ${
-                      report.clientEmployerBusinessName
-                        ? "text-gray-800"
-                        : "text-gray-400 italic"
-                    }`}
-                  >
-                    {report.clientEmployerBusinessName || "N/A"}
-                  </td>
-                  <td
-                    className={`p-3 ${
-                      report.bmDomainId
-                        ? "text-gray-800"
-                        : "text-gray-400 italic"
-                    }`}
-                  >
-                    {report.bmDomainId || "N/A"}
-                  </td>
-                  <td className="border px-4 py-2">
-                    <div className="flex gap-2">
-                      <Button className="bg-blue-700 text-white hover:bg-blue-600 flex items-center gap-1">
-                        <MdVisibility size={18} className="mr-2" />
-                        <Link
-                          href={`/reports/detail/${report.id}?action=360-leads`}
-                        >
-                          Details
-                        </Link>
-                      </Button>
+                    <td className="p-3">{index + 1}</td>
+                    <td
+                      className={`p-3 ${
+                        report.creator_name
+                          ? "text-gray-800"
+                          : "text-gray-400 italic"
+                      }`}
+                    >
+                      {report.creator_name || "N/A"}
+                    </td>
+                    <td
+                      className={`p-3 ${
+                        report.clientName
+                          ? "text-gray-800"
+                          : "text-gray-400 italic"
+                      }`}
+                    >
+                      {report.clientName || "N/A"}
+                    </td>
+                    <td
+                      className={`p-3 ${
+                        report.clientCellNumber
+                          ? "text-gray-800"
+                          : "text-gray-400 italic"
+                      }`}
+                    >
+                      {`${report.clientCellCode} ${report.clientCellNumber}` ||
+                        "N/A"}
+                    </td>
+                    <td
+                      className={`p-3 ${
+                        report.clientEmployerBusinessName
+                          ? "text-gray-800"
+                          : "text-gray-400 italic"
+                      }`}
+                    >
+                      {report.clientEmployerBusinessName || "N/A"}
+                    </td>
+                    <td
+                      className={`p-3 ${
+                        report.bmDomainId
+                          ? "text-gray-800"
+                          : "text-gray-400 italic"
+                      }`}
+                    >
+                      {report.bmDomainId || "N/A"}
+                    </td>
+                    <td className="border px-4 py-2">
+                      <div className="flex gap-2">
+                        <Button className="bg-blue-700 text-white hover:bg-blue-600 flex items-center gap-1">
+                          <MdVisibility size={18} className="mr-2" />
+                          <Link
+                            href={`/reports/detail/${report.id}?action=360-leads`}
+                          >
+                            Details
+                          </Link>
+                        </Button>
 
-                      <Button
-                        className="bg-red-600 text-white hover:bg-red-600 flex items-center gap-1"
-                        onClick={() => handleDelete(report.id)}
-                      >
-                        <MdDelete size={18} className="mr-2" />
-                        Delete
-                      </Button>
-                    </div>
+                        <Button
+                          className="bg-red-600 text-white hover:bg-red-600 flex items-center gap-1"
+                          onClick={() => handleDelete(report.id)}
+                        >
+                          <MdDelete size={18} className="mr-2" />
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="p-4 text-center text-gray-500">
+                    No records found.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="p-4 text-center text-gray-500">
-                  No records found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </motion.div>
 
       <div className="flex justify-center mt-4">

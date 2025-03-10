@@ -61,7 +61,7 @@ export default function ChamberDocManager() {
 
     return (
         <div
-            className="p-6  w-full rounded-xl h-full transition-all duration-300">
+            className="p-6  w-full rounded-xl h-full transition-all duration-300 h-max">
             <h2 className="text-2xl font-bold mb-6 text-teal-600 text-center">Chamber of Commerce Manager</h2>
             <div className='grid  grid-cols-1 gap-6 bg-white rounded-lg shadow-lg p-4'>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

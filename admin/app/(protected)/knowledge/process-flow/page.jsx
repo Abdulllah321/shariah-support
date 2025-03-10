@@ -120,52 +120,74 @@ export default function ProcessFlowUploader() {
     };
 
     return (
-        <div className="p-6 bg-white shadow-2xl rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800 transition-all duration-300">
-            <h2 className="text-2xl font-bold mb-6 text-teal-600 text-center">Process Flow Manager</h2>
-            <div className={'grid md:grid-cols-3 grid-cols-1 gap-10'}>
-            <div>
-            <div {...getRootProps()} className="border-2 border-dashed p-8 text-center rounded-lg cursor-pointer bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 hover:shadow-md transition-all duration-300">
-                <input {...getInputProps()} />
-                {renderFilePreview()}
-                {!preview && <p className="text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2"><FiFilePlus size={20} /> Drag & drop a file here, or click to select</p>}
+        <div className="p-6 bg-white shadow-2xl rounded-xl border border-gray-200 dark:bg-gray-900 dark:border-gray-800 transition-all duration-300 h-max">
+        <h2 className="text-2xl font-bold mb-6 text-teal-600 text-center">Process Flow Manager</h2>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* File Upload Section */}
+          <div>
+            <div {...getRootProps()} className="border-2 border-dashed p-6 sm:p-8 text-center rounded-lg cursor-pointer bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 hover:shadow-md transition-all duration-300">
+              <input {...getInputProps()} />
+              {renderFilePreview()}
+              {!preview && (
+                <p className="text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2 text-sm sm:text-base">
+                  <FiFilePlus size={20} /> Drag & drop a file here, or click to select
+                </p>
+              )}
             </div>
-
+      
             <textarea
-                className="w-full p-3 mt-4 border rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-gray-50 dark:bg-gray-800 dark:text-white"
-                placeholder="Enter description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+              className="w-full p-3 mt-4 border rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:outline-none bg-gray-50 dark:bg-gray-800 dark:text-white text-sm sm:text-base"
+              placeholder="Enter description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             ></textarea>
-
+      
             <button
-                className="w-full mt-6 py-3 flex items-center justify-center gap-2 bg-teal-600 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-700 transition-all duration-300 disabled:opacity-50"
-                onClick={handleUpload}
-                disabled={uploading}
+              className="w-full mt-4 py-2 sm:py-3 flex items-center justify-center gap-2 bg-teal-600 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-700 transition-all duration-300 disabled:opacity-50 text-sm sm:text-base"
+              onClick={handleUpload}
+              disabled={uploading}
             >
-                {uploading ? "Uploading..." : <><FiUpload size={20} /> {editingId ? "Update" : "Upload"} Process Flow</>}
+              {uploading ? "Uploading..." : (
+                <>
+                  <FiUpload size={20} />
+                  {editingId ? "Update" : "Upload"} Process Flow
+                </>
+              )}
             </button>
-            </div>
-            <div className="mt-8 col-span-2">
-                {processFlows.map(flow => {
-                    const fileName = decodeURIComponent(flow.fileUrl.split('/').pop().split('?')[0]); // فائل کا نام نکالنا
-                    const fileExtension = fileName.split('.').pop().toUpperCase(); // فارمیٹ نکالنا
-
-                    return (
-                        <div key={flow.id} className="flex justify-between items-center bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-md mt-4">
-                            <div className="flex flex-col">
-                                <p className="font-semibold text-gray-800 dark:text-white">{flow.description}</p>
-                                <p className="text-gray-600 dark:text-gray-400 text-sm">{fileName} <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs">{fileExtension}</span></p>
-                                <a href={flow.fileUrl} target="_blank" rel="noopener noreferrer" className="text-teal-500 text-sm mt-1">View File</a>
-                            </div>
-                            <div className="flex gap-3">
-                                <button className="text-yellow-500 hover:text-yellow-700" onClick={() => handleEdit(flow)}><FiEdit size={20} /></button>
-                                <button className="text-red-500 hover:text-red-700" onClick={() => handleDelete(flow.id, flow.fileUrl)}><FiTrash2 size={20} /></button>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-            </div>
+          </div>
+      
+          {/* Process Flows List */}
+          <div className="sm:col-span-1 lg:col-span-2 mt-6 sm:mt-0">
+            {processFlows.length ? processFlows.map(flow => {
+              const fileName = decodeURIComponent(flow.fileUrl.split('/').pop().split('?')[0]);
+              const fileExtension = fileName.split('.').pop().toUpperCase();
+      
+              return (
+                <div key={flow.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-md mt-4">
+                  <div className="flex flex-col w-full sm:w-auto">
+                    <p className="font-semibold text-gray-800 dark:text-white">{flow.description}</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm">
+                      {fileName} <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs">{fileExtension}</span>
+                    </p>
+                    <a href={flow.fileUrl} target="_blank" rel="noopener noreferrer" className="text-teal-500 text-sm mt-1">View File</a>
+                  </div>
+                  <div className="flex gap-3 mt-3 sm:mt-0">
+                    <button className="text-yellow-500 hover:text-yellow-700" onClick={() => handleEdit(flow)}>
+                      <FiEdit size={20} />
+                    </button>
+                    <button className="text-red-500 hover:text-red-700" onClick={() => handleDelete(flow.id, flow.fileUrl)}>
+                      <FiTrash2 size={20} />
+                    </button>
+                  </div>
+                </div>
+              );
+            }) : (
+              <p className="text-center text-gray-500">No process flows found.</p>
+            )}
+          </div>
         </div>
+      </div>
+      
     );
 }

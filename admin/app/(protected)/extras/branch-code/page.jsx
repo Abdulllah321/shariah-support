@@ -12,7 +12,6 @@ import {
 import { Button, Drawer, Label, TextInput } from "flowbite-react";
 import { HiBuildingOffice } from "react-icons/hi2"; // Icon for branch
 import Loader from "@/components/Loader";
-import { useRouter } from "next/navigation";
 import Papa from "papaparse";
 
 export const theme = {
@@ -167,8 +166,8 @@ const BranchManagement = () => {
         Branch Management
       </h1>
 
-      <div className="flex items-center gap-4 mb-6 justify-between">
-        <label className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200">
+      <div className="flex items-center gap-4 mb-6 justify-between lg:flex-nowrap flex-wrap">
+        <label className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200 w-full lg:w-auto text-center">
           Bulk Upload
           <input
             type="file"
@@ -177,7 +176,7 @@ const BranchManagement = () => {
             className="hidden"
           />
         </label>
-        <form className="w-[28rem] mx-auto mb-4">
+        <form className="w-[28rem] mx-auto mb-4 max-w-full">
           <div className="relative">
             <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
               <svg
@@ -220,7 +219,7 @@ const BranchManagement = () => {
             });
             setSelectedBranch(null);
           }}
-          className="bg-teal-600 text-white rounded-md hover:bg-teal-700 transition duration-200"
+          className="bg-teal-600 text-white rounded-md hover:bg-teal-700 transition duration-200 w-full lg:w-auto text-center"
         >
           Add New Branch
         </Button>

@@ -58,7 +58,7 @@ export default function MadarisCRUD() {
     };
 
     return (
-        <div className="p-5 w-full min-h-screen">
+        <div className="p-5 w-full min-h-screen h-max">
             <h1 className="text-3xl font-bold text-teal-700 mb-4">Madaris Management</h1>
 
             <div className="flex space-x-2">

@@ -105,12 +105,12 @@ const ActivitiesPage = () => {
       batch.update(activityRef, { order: index });
     });
   
-    await batch.commit(); // Execute batch update
+    await batch.commit(); 
   };
   
 
   return (
-    <div className="mx-auto p-6 ">
+    <div className="mx-auto p-6 w-full">
       <h1 className="text-3xl font-semibold text-gray-800 mb-6">
         Activities Management
       </h1>
@@ -134,87 +134,75 @@ const ActivitiesPage = () => {
 
       {/* Activities Table */}
       {isLoading ? (
-        <Loader />
-      ) : (
-        <div className="mt-6 bg-white shadow rounded-lg mx-auto w-full">
-          <DndContext
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={activities}
-              strategy={verticalListSortingStrategy}
-            >
-              <table className="w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Name
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Local
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Outstation Day Trip
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Outstation Long Distance
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {activities.length ? (
-                    activities.map((activity, index) => (
-                      <SortableItem key={activity.id} id={activity.id}>
-                        <td className="px-6 py-4">{activity.name}</td>
-                        <td className="px-6 py-4 text-right">
-                          {activity.local}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {activity.outstationDayTrip}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {activity.outstationLongDistance}
-                        </td>
-                        <td className="px-6 py-4 flex space-x-4">
-                          <Button
-                            onClick={() => {
-                              setSelectedActivity(activity);
-                              setNewActivity(activity);
-                              setShowDrawer(true);
-                            }}
-                            className="bg-teal-600 text-white"
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              setSelectedActivity(activity.id); // Set the selected scholar for deletion
-                              setShowModal(true); // Open delete confirmation modal
-                            }}
-                            className="bg-red-600 text-white"
-                          >
-                            Delete
-                          </Button>
-                        </td>
-                      </SortableItem>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="5" className="text-center py-4">
-                        No activities found
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </SortableContext>
-          </DndContext>
-        </div>
-      )}
+  <Loader />
+) : (
+  <div className="mt-6 bg-white shadow rounded-lg mx-auto w-full overflow-x-auto">
+    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <SortableContext items={activities} strategy={verticalListSortingStrategy}>
+        <table className="w-full min-w-[600px] md:min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Name
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Local
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Outstation Day Trip
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Outstation Long Distance
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {activities.length ? (
+              activities.map((activity) => (
+                <SortableItem key={activity.id} id={activity.id}>
+                  <td className="px-4 py-4">{activity.name}</td>
+                  <td className="px-4 py-4 text-right">{activity.local}</td>
+                  <td className="px-4 py-4 text-right">{activity.outstationDayTrip}</td>
+                  <td className="px-4 py-4 text-right">{activity.outstationLongDistance}</td>
+                  <td className="px-4 py-4 flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0">
+                    <Button
+                      onClick={() => {
+                        setSelectedActivity(activity);
+                        setNewActivity(activity);
+                        setShowDrawer(true);
+                      }}
+                      className="bg-teal-600 text-white w-full md:w-auto"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setSelectedActivity(activity.id);
+                        setShowModal(true);
+                      }}
+                      className="bg-red-600 text-white w-full md:w-auto"
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </SortableItem>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center py-4">
+                  No activities found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </SortableContext>
+    </DndContext>
+  </div>
+)}
 
       {/* Add/Edit Modal */}
       <Drawer

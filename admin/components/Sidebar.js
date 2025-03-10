@@ -14,7 +14,7 @@ import {
   HiOfficeBuilding,
   HiArrowSmRight,
 } from "react-icons/hi";
-import { MdArrowDropDown } from "react-icons/md";
+import { MdArrowDropDown, MdClose, MdMenu } from "react-icons/md";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { signOut } from "firebase/auth";
@@ -24,6 +24,7 @@ function AdminSidebar({ children }) {
   const [isOpen, setIsOpen] = useState(true); // State to toggle sidebar size
   const [showModal, setShowModal] = useState(false); // State for modal visibility
   const [expanded, setExpanded] = useState(null); // Track expanded sidebar item
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const pathname = usePathname(); // Get the current path
   const router = useRouter();
@@ -134,15 +135,32 @@ function AdminSidebar({ children }) {
     }
   };
 
-
-
   return (
     <>
+      {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+        {isMobileOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className={"fixed inset-0 bg-black bg-opacity-50 z-40"}
+            onClick={() => setIsMobileOpen(false)}
+          ></motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar Container */}
       <div
-        className={`h-screen transition-all duration-300 gap-4 flex flex-col relative`}
-        style={{ width: isOpen ? "16rem" : "4rem" }}
+        className={`fixed md:relative h-screen z-50 bg-teal-600 text-white transition-all duration-300 flex flex-col  shadow-lg ${
+          isMobileOpen ? "w-64" : isOpen ? "w-64" : "w-16"
+        } ${
+          isMobileOpen
+            ? "translate-x-0"
+            : "-translate-x-64 md:translate-x-0"
+        }`}
       >
-        <motion.div
+        <div
           className={`h-full bg-teal-600 text-white relative overflow-y-auto overflow-x-hidden`}
           initial={false}
           animate={{ width: isOpen ? "16rem" : "4rem" }}
@@ -165,7 +183,7 @@ function AdminSidebar({ children }) {
                   className="text-teal-100 text-xl font-semibold"
                 >
                   Admin Panel
-                  <p className="text-xs">Shariah Compliance & review</p>
+                  <p className="text-xs">Shariah Support & Services</p>
                 </motion.span>
               )}
             </div>
@@ -297,10 +315,10 @@ function AdminSidebar({ children }) {
               </AnimatePresence>
             </div>
           </div>
-        </motion.div>
+        </div>
         <button
           onClick={toggleSidebar}
-          className="absolute top-1/2 -right-8 w-16 h-16 rounded-full focus:outline-none flex items-center justify-center text-xl shadow-2xl overflow-hidden"
+          className="absolute top-1/2 -right-8 w-16 h-16 rounded-full focus:outline-none flex items-center justify-center text-xl shadow-2xl overflow-hidden hidden md:block"
         >
           <div className="flex h-full w-full">
             <div className="flex-1 bg-teal-800/50 text-white flex items-center justify-center">
@@ -348,7 +366,20 @@ function AdminSidebar({ children }) {
         </AnimatePresence>
       </div>
 
-      <div className="pl-10 pb-10 flex justify-center w-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-teal-700 dark:[&::-webkit-scrollbar-thumb]:bg-teal-500">
+      {/* Hamburger Menu Button */}
+      <button
+        className="fixed top-4 right-4 md:hidden z-50 bg-teal-600 text-white p-2 rounded-lg shadow-lg"
+        onClick={() => setIsMobileOpen(!isMobileOpen)}
+      >
+        {isMobileOpen ? (
+          <MdClose calcMode={"h-6 w-6"} />
+        ) : (
+          <MdMenu className="h-6 w-6" />
+        )}
+      </button>
+
+      {/* Page Content */}
+      <div className="pl-0 md:pl-10 pb-10 flex justify-center w-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-teal-700 dark:[&::-webkit-scrollbar-thumb]:bg-teal-500">
         {children}
       </div>
     </>

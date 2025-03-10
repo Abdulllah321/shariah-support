@@ -86,8 +86,6 @@ export default function Reports() {
     }
   };
 
-
-
   const totalPages = Math.ceil(filteredReports.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
   const currentRows = filteredReports.slice(
@@ -117,8 +115,8 @@ export default function Reports() {
       <h1 className="text-3xl font-semibold text-gray-800 mb-6">
         Staff Interview Reports
       </h1>
-      <div className="flex justify-between items-center mb-4">
-        <form className="w-[28rem]">
+      <div className="flex justify-between md:items-center mb-4 flex-col-reverse md:flex-row gap-2">
+        <form className="w-[28rem] max-w-full">
           <div className="relative">
             <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
               <FiSearch className="w-4 h-4 text-gray-500" />
@@ -132,8 +130,10 @@ export default function Reports() {
             />
           </div>
         </form>
-        <ExportModal dailyActivityRecords={filteredReports} action={'staff-interview'}  />
-
+        <ExportModal
+          dailyActivityRecords={filteredReports}
+          action={"staff-interview"}
+        />
       </div>
 
       <motion.div
@@ -142,85 +142,87 @@ export default function Reports() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <table className="w-full divide-y divide-gray-200 rounded-md">
-          <thead className="bg-teal-800">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider">
-                Index
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("name")}
-              >
-                Interviewer Name
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("branchName")}
-              >
-                Branch
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("staffName")}
-              >
-                Staff Name
-              </th>{" "}
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("activity")}
-              >
-                Employee Number
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("date")}
-              >
-                Date
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentRows.map((report, index) => (
-              <tr
-                key={report.id}
-                className="hover:bg-teal-100 odd:bg-gray-50 even:bg-white"
-              >
-                <td className="border px-4 py-2">#{index + 1}</td>
-                <td className="border px-4 py-2">{report.name}</td>
-                <td className="border px-4 py-2">{report.branchName}</td>
-                <td className="border px-4 py-2">{report.staffName}</td>
-                <td className="border px-4 py-2">{report.employeeName}</td>
-                <td className="border px-4 py-2">
-                  {new Date(report.visitDate).toLocaleDateString()}
-                </td>
-                <td className="border px-4 py-2">
-                  <div className="flex gap-2">
-                    <Button className="bg-blue-700 text-white hover:bg-blue-600 flex items-center gap-1">
-                      <MdVisibility size={18} className="mr-2" />
-                      <Link
-                        href={`/reports/detail/${report.id}?action=staff-interview`}
-                      >
-                        Details
-                      </Link>
-                    </Button>
-
-                    <Button
-                      className="bg-red-600 text-white hover:bg-red-600 flex items-center gap-1"
-                      onClick={() => handleDelete(report.id)}
-                    >
-                      <MdDelete size={18} className="mr-2" />
-                      Delete
-                    </Button>
-                  </div>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full divide-y divide-gray-200 rounded-md">
+            <thead className="bg-teal-800">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider">
+                  Index
+                </th>
+                <th
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort("name")}
+                >
+                  Interviewer Name
+                </th>
+                <th
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort("branchName")}
+                >
+                  Branch
+                </th>
+                <th
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort("staffName")}
+                >
+                  Staff Name
+                </th>{" "}
+                <th
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort("activity")}
+                >
+                  Employee Number
+                </th>
+                <th
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort("date")}
+                >
+                  Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-50 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentRows.map((report, index) => (
+                <tr
+                  key={report.id}
+                  className="hover:bg-teal-100 odd:bg-gray-50 even:bg-white"
+                >
+                  <td className="border px-4 py-2">#{index + 1}</td>
+                  <td className="border px-4 py-2">{report.name}</td>
+                  <td className="border px-4 py-2">{report.branchName}</td>
+                  <td className="border px-4 py-2">{report.staffName}</td>
+                  <td className="border px-4 py-2">{report.employeeName}</td>
+                  <td className="border px-4 py-2">
+                    {new Date(report.visitDate).toLocaleDateString()}
+                  </td>
+                  <td className="border px-4 py-2">
+                    <div className="flex gap-2">
+                      <Button className="bg-blue-700 text-white hover:bg-blue-600 flex items-center gap-1">
+                        <MdVisibility size={18} className="mr-2" />
+                        <Link
+                          href={`/reports/detail/${report.id}?action=staff-interview`}
+                        >
+                          Details
+                        </Link>
+                      </Button>
+
+                      <Button
+                        className="bg-red-600 text-white hover:bg-red-600 flex items-center gap-1"
+                        onClick={() => handleDelete(report.id)}
+                      >
+                        <MdDelete size={18} className="mr-2" />
+                        Delete
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </motion.div>
 
       <div className="flex justify-center mt-4">

@@ -119,7 +119,10 @@ export default function Reports() {
 
   const totalPages = Math.ceil(filteredReports.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const currentRows = filteredReports.slice(startIndex, startIndex + rowsPerPage);
+  const currentRows = filteredReports.slice(
+    startIndex,
+    startIndex + rowsPerPage
+  );
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -136,8 +139,8 @@ export default function Reports() {
         Daily Activity Report
       </h1>
 
-      <div className="flex justify-between items-center mb-4">
-        <form className="w-[28rem]">
+      <div className="flex justify-between md:items-center mb-4 flex-col-reverse md:flex-row gap-2">
+        <form className="w-[28rem] max-w-full">
           <div className="relative">
             <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
               <FiSearch className="w-4 h-4 text-gray-500" />
@@ -151,71 +154,107 @@ export default function Reports() {
             />
           </div>
         </form>
-        <ExportModal dailyActivityRecords={filteredReports} action={"daily-activity"} />
+        <ExportModal
+          dailyActivityRecords={filteredReports}
+          action={"daily-activity"}
+        />
       </div>
 
       <motion.div className="overflow-hidden bg-white shadow-lg rounded-lg">
-        <table className="w-full table-auto border-collapse">
-          <thead className="bg-teal-800 text-white">
-            <tr>
-              <th className="p-3">#</th>
-              {[
-                { label: "Name", key: "name" },
-                { label: "Activity", key: "activity" },
-                { label: "Branch", key: "branchName" },
-                { label: "City", key: "city" },
-                { label: "Date", key: "date" },
-              ].map(({ label, key }) => (
-                <th
-                  key={key}
-                  className="p-3 cursor-pointer"
-                  onClick={() => handleSort(key)}
-                >
-                  {label} {sortConfig.key === key ? (sortConfig.direction === "asc" ? "↑" : "↓") : "↕"}
-                </th>
-              ))}
-              <th className="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentRows.length ? (
-              currentRows.map((report, index) => (
-                <tr key={report.id} className="hover:bg-teal-100 odd:bg-gray-50 even:bg-white border-t">
-                  <td className="p-3">{index + 1}</td>
-                  <td className="p-3">{report.name || "N/A"}</td>
-                  <td className="p-3">{report.activity || "N/A"}</td>
-                  <td className="p-3">{report.branchName || "N/A"}</td>
-                  <td className="p-3">{report.city || "N/A"}</td>
-                  <td className="p-3">{formatDate(report.date)}</td>
-                  <td className="p-3">
-                    <div className="flex gap-2">
-                      <Link href={`/reports/detail/${report.id}?action=daily-activity`}>
-                        <Button className="bg-blue-700 text-white flex items-center gap-1">
-                          <MdVisibility size={18} />
-                          Details
+        <div className="overflow-x-auto">
+          <table className="w-full table-auto border-collapse min-w-max">
+            <thead className="bg-teal-800 text-white">
+              <tr>
+                <th className="p-3">#</th>
+                {[
+                  { label: "Name", key: "name" },
+                  { label: "Activity", key: "activity" },
+                  { label: "Branch", key: "branchName" },
+                  { label: "City", key: "city" },
+                  { label: "Date", key: "date" },
+                ].map(({ label, key }) => (
+                  <th
+                    key={key}
+                    className="p-3 cursor-pointer"
+                    onClick={() => handleSort(key)}
+                  >
+                    {label}{" "}
+                    {sortConfig.key === key
+                      ? sortConfig.direction === "asc"
+                        ? "↑"
+                        : "↓"
+                      : "↕"}
+                  </th>
+                ))}
+                <th className="p-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentRows.length ? (
+                currentRows.map((report, index) => (
+                  <tr
+                    key={report.id}
+                    className="hover:bg-teal-100 odd:bg-gray-50 even:bg-white border-t text-sm md:text-base"
+                  >
+                    <td className="p-3">{index + 1}</td>
+                    <td className="p-3">{report.name || "N/A"}</td>
+                    <td className="p-3">{report.activity || "N/A"}</td>
+                    <td className="p-3">{report.branchName || "N/A"}</td>
+                    <td className="p-3">{report.city || "N/A"}</td>
+                    <td className="p-3">{formatDate(report.date)}</td>
+                    <td className="p-3">
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <Link
+                          href={`/reports/detail/${report.id}?action=daily-activity`}
+                        >
+                          <Button className="bg-blue-700 text-white flex items-center gap-1">
+                            <MdVisibility size={18} />
+                            Details
+                          </Button>
+                        </Link>
+                        <Button
+                          className="bg-red-600 text-white flex items-center gap-1"
+                          onClick={() => handleDelete(report.id)}
+                        >
+                          <MdDelete size={18} />
+                          Delete
                         </Button>
-                      </Link>
-                      <Button className="bg-red-600 text-white flex items-center gap-1" onClick={() => handleDelete(report.id)}>
-                        <MdDelete size={18} />
-                        Delete
-                      </Button>
-                    </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="p-4 text-center text-gray-500">
+                    No records found.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr><td colSpan="7" className="p-4 text-center text-gray-500">No records found.</td></tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </motion.div>
 
       {/* Pagination Controls */}
       <div className="flex justify-between items-center mt-4">
-        <p>Page {currentPage} of {totalPages}</p>
+        <p>
+          Page {currentPage} of {totalPages}
+        </p>
         <div className="flex gap-2">
-          <Button color="teal" disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>Prev</Button>
-          <Button disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)} className="bg-teal-500">Next</Button>
+          <Button
+            color="teal"
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+          >
+            Prev
+          </Button>
+          <Button
+            disabled={currentPage === totalPages}
+            onClick={() => handlePageChange(currentPage + 1)}
+            className="bg-teal-500"
+          >
+            Next
+          </Button>
         </div>
       </div>
     </motion.div>

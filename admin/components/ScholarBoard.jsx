@@ -228,7 +228,7 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
                   },
                 },
               }}
-              className="h-[300px] md:h-[400px] max-h-[400px]"
+              className="h-[200px] max-h-[300px] w-full"
             />
           ) : (
             <div className="h-[300px] md:h-[400px] max-h-[400px] flex flex-col justify-between p-4">
