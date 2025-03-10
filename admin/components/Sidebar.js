@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   HiChartPie,
@@ -33,74 +33,84 @@ function AdminSidebar({ children }) {
     setExpanded(null);
   };
 
-  const sidebarItems = [
-    {
-      href: "/",
-      icon: HiChartPie,
-      label: "Dashboard",
-      subOptions: [],
-    },
-    {
-      href: "/scholars",
-      icon: HiUsers,
-      label: "Scholars Management",
-    },
+  const sidebarItems = useMemo(
+    () => [
+      {
+        href: "/",
+        icon: HiChartPie,
+        label: "Dashboard",
+        subOptions: [],
+      },
+      {
+        href: "/scholars",
+        icon: HiUsers,
+        label: "Scholars Management",
+      },
 
-    {
-      href: "/reports",
-      icon: HiDocumentText,
-      label: "Reports",
-      subOptions: [
-        { href: "/reports/daily", label: "Daily Activity Records" },
-        { href: "/reports/branch", label: "Branch Shariah Compliance Review" },
-        { href: "/reports/staff", label: "Staff Interview" },
-        {
-          href: "/reports/leads",
-          label: "360 Leads",
-        },
-      ],
-    },
-    {
-      href: "/knowledge",
-      icon: HiDocumentText,
-      label: "Knowledge Center",
-      subOptions: [
-        { href: "/knowledge/process-flow", label: "Process Flow" },
-        { href: "/knowledge/sessions-link", label: "Session Link" },
-        { href: "/knowledge/chamber-of-commerce", label: "Chamber of Commerce" },
-        {
-          href: "/knowledge/branch-list",
-          label: "Branch List",
-        },   {
-          href: "/knowledge/madaris-list",
-          label: "Madaris List",
-        },
-      ],
-    },
-    {
-      href: "/extras",
-      icon: HiLocationMarker,
-      label: "Extras",
-      subOptions: [
-        {
-          href: "/extras/questions",
-          label: "Staff Interview Questions",
-        },
-        {
-          href: "/extras/branch-review",
-          label: "Branch Review Questions",
-        },
-        {
-          href: "/extras/branch-code",
-          label: "Branch Management",
-        },
-        {
-          href: "/extras/activity",
-          label: "Activity & Score",
-        },
-      ],
-    },
-  ];
+      {
+        href: "/reports",
+        icon: HiDocumentText,
+        label: "Reports",
+        subOptions: [
+          { href: "/reports/daily", label: "Daily Activity Records" },
+          {
+            href: "/reports/branch",
+            label: "Branch Shariah Compliance Review",
+          },
+          { href: "/reports/staff", label: "Staff Interview" },
+          {
+            href: "/reports/leads",
+            label: "360 Leads",
+          },
+        ],
+      },
+      {
+        href: "/knowledge",
+        icon: HiDocumentText,
+        label: "Knowledge Center",
+        subOptions: [
+          { href: "/knowledge/process-flow", label: "Process Flow" },
+          { href: "/knowledge/sessions-link", label: "Session Link" },
+          {
+            href: "/knowledge/chamber-of-commerce",
+            label: "Chamber of Commerce",
+          },
+          {
+            href: "/knowledge/branch-list",
+            label: "Branch List",
+          },
+          {
+            href: "/knowledge/madaris-list",
+            label: "Madaris List",
+          },
+        ],
+      },
+      {
+        href: "/extras",
+        icon: HiLocationMarker,
+        label: "Extras",
+        subOptions: [
+          {
+            href: "/extras/questions",
+            label: "Staff Interview Questions",
+          },
+          {
+            href: "/extras/branch-review",
+            label: "Branch Review Questions",
+          },
+          {
+            href: "/extras/branch-code",
+            label: "Branch Management",
+          },
+          {
+            href: "/extras/activity",
+            label: "Activity & Score",
+          },
+        ],
+      },
+    ],
+    []
+  );
 
   useEffect(() => {
     if (isOpen)
@@ -112,7 +122,7 @@ function AdminSidebar({ children }) {
         );
         setExpanded(item?.href);
       }
-  }, [isOpen]);
+  }, [isOpen, pathname, sidebarItems]);
 
   const handleLogout = async () => {
     try {
@@ -124,13 +134,27 @@ function AdminSidebar({ children }) {
     }
   };
 
+  useEffect(() => {
+    const element = document.querySelector(".h-full.overflow-hidden");
+    if (element) {
+      const elementTop = element.getBoundingClientRect().top; // Distance from top of viewport
+      const elementHeight = element.clientHeight; // Height of element
+      const viewportHeight = window.innerHeight; // Total viewport height (100vh)
+
+      console.log("Element Distance from Top:", elementTop);
+      console.log("Element Height:", elementHeight);
+      console.log("Remaining Space:", viewportHeight - elementTop);
+    }
+  }, []);
+
   return (
     <>
       <div
-        className={`flex h-screen transition-all duration-300 min-w-[4rem] gap-4`}
+        className={`h-screen transition-all duration-300 gap-4 flex flex-col relative`}
+        style={{ width: isOpen ? "16rem" : "4rem" }}
       >
         <motion.div
-          className={`h-full bg-teal-600 text-white relative`}
+          className={`h-full bg-teal-600 text-white relative overflow-y-auto overflow-x-hidden`}
           initial={false}
           animate={{ width: isOpen ? "16rem" : "4rem" }}
           transition={{ duration: 0.3 }}
@@ -152,14 +176,14 @@ function AdminSidebar({ children }) {
                   className="text-teal-100 text-xl font-semibold"
                 >
                   Admin Panel
-                  <p className="text-xs">Sheriah Compliance & review</p>
+                  <p className="text-xs">Shariah Compliance & review</p>
                 </motion.span>
               )}
             </div>
           </div>
 
           {/* Sidebar Items */}
-          <div className="h-full overflow-y-auto overflow-x-hidden rounded-t-2xl bg-gray-50 px-3 py-4 relative top-0">
+          <div className="h-full overflow-hidden rounded-t-2xl bg-gray-50 px-3 py-4">
             <div className="mt-4 space-y-2 border-t border-gray-200 pt-4 first:mt-0 first:border-t-0 first:pt-0">
               {sidebarItems.map((item, index) => {
                 const isParentActive =
@@ -284,20 +308,20 @@ function AdminSidebar({ children }) {
               </AnimatePresence>
             </div>
           </div>
-          <button
-            onClick={toggleSidebar}
-            className="absolute top-1/2 -right-8 w-16 h-16 rounded-full focus:outline-none flex items-center justify-center text-xl shadow-2xl overflow-hidden"
-          >
-            <div className="flex h-full w-full">
-              <div className="flex-1 bg-teal-800/50 text-white flex items-center justify-center">
-                {isOpen ? "←" : ""}
-              </div>
-              <div className="flex-1 bg-white/50 text-teal-800 flex items-center justify-center">
-                {!isOpen ? "→" : ""}
-              </div>
-            </div>
-          </button>
         </motion.div>
+        <button
+          onClick={toggleSidebar}
+          className="absolute top-1/2 -right-8 w-16 h-16 rounded-full focus:outline-none flex items-center justify-center text-xl shadow-2xl overflow-hidden"
+        >
+          <div className="flex h-full w-full">
+            <div className="flex-1 bg-teal-800/50 text-white flex items-center justify-center">
+              {isOpen ? "←" : ""}
+            </div>
+            <div className="flex-1 bg-white/50 text-teal-800 flex items-center justify-center">
+              {!isOpen ? "→" : ""}
+            </div>
+          </div>
+        </button>
 
         {/* Modal for Logout Confirmation */}
         <AnimatePresence>
@@ -335,10 +359,7 @@ function AdminSidebar({ children }) {
         </AnimatePresence>
       </div>
 
-      <div
-        id="scroll-div"
-        className="pl-10 pb-10 flex justify-center w-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-teal-700 dark:[&::-webkit-scrollbar-thumb]:bg-teal-500"
-      >
+      <div className="pl-10 pb-10 flex justify-center w-full overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-teal-700 dark:[&::-webkit-scrollbar-thumb]:bg-teal-500">
         {children}
       </div>
     </>

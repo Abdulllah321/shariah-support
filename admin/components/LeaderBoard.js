@@ -130,7 +130,7 @@ const Page = () => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-lg h-full overflow-y-auto">
+    <div className="p-6 bg-white rounded-lg shadow-lg h-full">
       <div className="mb-4 flex justify-between">
         {loading ? (
           <Skeleton className="h-10 w-32 rounded-lg" />

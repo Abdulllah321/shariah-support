@@ -13,11 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Shriah Compliance and advisory ",
-
+  title: "Shariah Compliance and advisory ",
 };
 
 export default function RootLayout({ children }) {
+
   return (
     <html lang="en">
       <body
