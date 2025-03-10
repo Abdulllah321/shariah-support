@@ -1,5 +1,4 @@
 import { db } from "@/firebase";
-import { Skeleton } from "@heroui/skeleton";
 import { collection, onSnapshot } from "firebase/firestore";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -17,6 +16,9 @@ import { FreeMode, Navigation } from "swiper/modules";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import { Bar } from "react-chartjs-2";
+import { Combobox } from "./DropdownMenu";
+import { Skeleton } from "./ui/skeleton";
+import { Label } from "flowbite-react";
 
 const ScholarBoard = ({ dailyActivityRecords }) => {
   const [isShowMore, setIsShowMore] = useState(false);
@@ -57,8 +59,6 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
 
     return () => unsubscribe();
   }, []);
-
-  console.log(activities);
 
   useEffect(() => {
     if (!isShowMore && sectionRef.current) {
@@ -126,11 +126,13 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
     .sort((a, b) => b[1] - a[1]) // Sort by count in descending order
     .slice(0, isShowMore ? undefined : 3) // Limit to top 3 unless isShowMore is true
     .sort((a, b) => {
-      const orderA = activities.find((act) => act.name === a[0])?.order ?? Infinity;
-      const orderB = activities.find((act) => act.name === b[0])?.order ?? Infinity;
-    
+      const orderA =
+        activities.find((act) => act.name === a[0])?.order ?? Infinity;
+      const orderB =
+        activities.find((act) => act.name === b[0])?.order ?? Infinity;
+
       return orderA - orderB; // Sort by predefined order only
-    })    
+    })
     .map(([activity, count]) => `${activity} (${count})`);
 
   return (
@@ -146,6 +148,7 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
               : "max-h-[600px]"
           }`}
     >
+      <h1 className="text-2xl text-gray-800 font-bold mb-2" >Scholar Wise Performance</h1>
       {/* //Tabs */}
       <div className="border rounded-md w-full p-2">
         <div className="flex items-center justify-center px-4 bg-gray-100 text-gray-700  rounded-md w-full relative">
@@ -182,58 +185,22 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
       {/* Divider */}
       <div className="w-full h-0.5 bg-gray-200 dark:bg-gray-700/50 my-2" />
 
-      <div className="relative w-full mb-10">
-        {/* Left Arrow */}
-        <button
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/50 backdrop-blur-sm shadow-md p-2 -ml-6 rounded-full border border-gray-300 hover:bg-gray-200 transition"
-          id="swiper-prev-scholar"
-        >
-          <ChevronLeft className="w-6 h-6 text-gray-700" />
-        </button>
-
-        <Swiper
-          slidesPerView="auto"
-          spaceBetween={30}
-          freeMode={true}
-          navigation={{
-            prevEl: "#swiper-prev-scholar",
-            nextEl: "#swiper-next-scholar",
-          }}
-          modules={[FreeMode, Navigation]}
-          className="w-full "
-          slidesOffsetBefore={40} // Space before the first slide
-          slidesOffsetAfter={40} // Space after the last slide
-        >
-          {scholars.map((scholar) => (
-            <SwiperSlide
-              key={scholar.employeeId}
-              onClick={() => setSelectedScholar(scholar.employeeId)}
-              className={`flex flex-col items-center justify-center px-4 py-2 text-center rounded-lg border border-gray-300 shadow-lg bg-white !w-max cursor-pointer transition-all
-          ${
-            selectedScholar === scholar.employeeId
-              ? "!bg-teal-500 !text-white !border-teal-700 shadow-md"
-              : ""
-          }`}
-            >
-              <p className="text-lg font-semibold whitespace-nowrap">
-                {scholar.name}
-              </p>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-
-        {/* Right Arrow */}
-        <button
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/50 backdrop-blur-sm -mr-6 shadow-md p-2 rounded-full border border-gray-300 hover:bg-gray-200 transition"
-          id="swiper-next-scholar"
-        >
-          <ChevronRight className="w-6 h-6 text-gray-700" />
-        </button>
+      <div className="relative w-full mb-10 flex items-center justify-center gap-3">
+        <Label>Select Scholars: </Label>
+        <Combobox
+          frameworks={scholars}
+          value={selectedScholar}
+          setValue={setSelectedScholar}
+          placeholder="Select Scholar..."
+          title="Scholars"
+          label="name"
+          mapValue="employeeId"
+        />
       </div>
 
       {activeTab === "chart" ? (
         <>
-          <h2 className="text-xl font-semibold mb-4">Activity Distribution</h2>
+          <h2 className="text-xl font-semibold mb-4">Scholar Activity Distribution</h2>
           {chartData ? (
             <Bar
               data={chartData}
