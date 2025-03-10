@@ -15,6 +15,7 @@
     "axios": "^1.7.9",
     "chart.js": "^4.4.7",
     "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
     "file-saver": "^2.0.5",
     "firebase": "^11.1.0",
     "firebase-admin": "^13.0.2",
