@@ -331,7 +331,7 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
                         {index + 1}. {activity.name}
                       </span>
                       <span
-                        className={"absolute right-0 top-1/2 -translate-y-1/2 bg-gray-50 p-2 rounded-r-full h-full flex items-center justify-center"} 
+                        className={"absolute right-0 top-1/2 -translate-y-1/2 bg-gray-50 p-2 rounded-r-full h-full flex items-center justify-center w-12"} 
                       >
                         ({activity.count})
                       </span>
