@@ -55,11 +55,18 @@ const Page = () => {
         ...formData,
         creatorId: user?.employeeId,
         creator_name: user?.username,
+        updatedAt: new Date().toISOString(),
       };
+
       if (formData.id) {
-        await setDoc(doc(db, "360Leads", formData.id), updatedFormData);
+        await setDoc(doc(db, "360Leads", formData.id), updatedFormData, {
+          merge: true,
+        });
       } else {
-        await addDoc(collection(db, "360Leads"), updatedFormData);
+        await addDoc(collection(db, "360Leads"), {
+          ...updatedFormData,
+          createdAt: new Date().toISOString(),
+        });
       }
 
       router.push("/leads");

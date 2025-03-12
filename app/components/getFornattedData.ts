@@ -77,16 +77,19 @@ export const getFormattedData = (filteredData: any[], action: string, questions?
 
 
         case
-        "leads"
+        "360-leads"
         :
             return filteredData.map((record) => ({
-                "Lead Name": record.name || "N/A",
-                "Contact Number": record.contact || "N/A",
-                "Lead Source": record.source || "N/A",
-                Status: record.status || "N/A",
-                "Follow-up Date": record.followUp
-                    ? format(new Date(record.followUp), "yyyy-MM-dd")
-                    : "N/A",
+                "BM Domain": record.bmDomainId || "N/A",
+                "Client Name": record.clientName || "N/A",
+                "Client Cell Code": record.clientCellCode || "N/A",
+                "Client Cell Number": record.clientCellNumber || "N/A",
+                "Client Business Address": record.clientBusinessAddress || "N/A",
+                "Client Employer / Business Name":
+                  record.clientEmployerBusinessName || "N/A",
+                "Creator Name": record.creator_name || "N/A",
+                "Creator Domain": record.creatorId || "N/A",
+                "BM Branch Code": record.bmBranchCode || "N/A",
             }));
 
         default:

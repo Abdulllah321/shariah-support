@@ -9,4 +9,6 @@ export type leadsType = {
     clientName: string;
     creatorId: string;
     creator_name: string;
+    createdAt: string;
+    updatedAt: string;
 };
