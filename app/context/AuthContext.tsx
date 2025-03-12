@@ -38,11 +38,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Login function
     const login = (userData: User) => {
-        const expiry = Date.now() + 24 * 60 * 60 * 1000; // 1 day session
+        const expiry = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7-day session
         localStorage.setItem("session", JSON.stringify({ ...userData, expiry }));
         setUser(userData);
         router.replace("/");
     };
+    
 
     // Logout function
     const logout = () => {

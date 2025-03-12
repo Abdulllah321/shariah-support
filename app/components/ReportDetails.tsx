@@ -25,7 +25,7 @@ const actionMap: Record<string, (id: string) => Promise<any>> = {
     "daily-activity": async (id) => getDoc(doc(db, "records", id)),
     "branch-review": async (id) => getDoc(doc(db, "BranchReview", id)),
     "staff-interview": async (id) => getDoc(doc(db, "StaffReview", id)),
-    "leads": async (id) => getDoc(doc(db, "360Leads", id)),
+    "360-leads": async (id) => getDoc(doc(db, "360Leads", id)),
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getReportList = async (action: string, data: any) => {
@@ -36,7 +36,7 @@ const getReportList = async (action: string, data: any) => {
             return await getBranchReviewList(data);
         case "staff-interview":
             return await getStaffInterviewList(data);
-        case "leads":
+        case "360-leads":
             return get360LeadsList(data);
         default:
             return [];

@@ -1,208 +1,283 @@
 "use client";
 
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import useDailyActivityFormFields from "@/constants/BranchShariahForm";
 import FormGenerator from "@/components/FormGenerator";
-import {useRouter} from "next/navigation";
-import {addDoc, orderBy, setDoc} from "@firebase/firestore";
-import {collection, doc, getDocs, query} from "firebase/firestore";
-import {db} from "@/lib/firebase";
-import {useRecord} from "@/context/RecordContext";
-import {Card, CardBody, CardHeader} from "@heroui/card";
-import {ArrowLeft} from "lucide-react";
-import {Divider} from "@heroui/divider";
+import { useRouter, useSearchParams } from "next/navigation";
+import { addDoc, orderBy, setDoc } from "@firebase/firestore";
+import { collection, doc, getDocs, query } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { useRecord } from "@/context/RecordContext";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { ArrowLeft } from "lucide-react";
+import { Divider } from "@heroui/divider";
 import QuestionsList from "@/components/QuestionsList";
-import {EmployeeData} from "@/types/branchShariahTypes";
-import {Button} from "@heroui/button";
-import {useAuth} from "@/context/AuthContext";
+import { EmployeeData } from "@/types/branchShariahTypes";
+import { Button } from "@heroui/button";
+import { useAuth } from "@/context/AuthContext";
+import { Skeleton } from "@heroui/react";
+import { addToast } from "@heroui/toast";
 
 const DRAFT_STORAGE_KEY = "cachedBranchShariahReviews";
 
 const Page = () => {
-    const formFields = useDailyActivityFormFields();
-    const [formData, setFormData] = useState<EmployeeData>({} as EmployeeData);
-    const [loading, setLoading] = useState(false);
-    const [saving, setSaving] = useState(false);
-    const router = useRouter();
-    const {branches} = useRecord();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [questions, setQuestions] = useState<any[]>([]);
-    const [questionLoading, setQuestionLoading] = useState<boolean>(false);
-    const [uniqueId] = useState(() => Date.now().toString());
-    const {user} = useAuth();
+  const formFields = useDailyActivityFormFields();
+  const [formData, setFormData] = useState<EmployeeData>({} as EmployeeData);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const router = useRouter();
+  const { branches, fetchBranchShariahById } = useRecord();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [questionLoading, setQuestionLoading] = useState<boolean>(false);
+  const [uniqueId] = useState(() => Date.now().toString());
+  const { user } = useAuth();
+  const [fetching, setFetching] = useState(false);
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
 
-    let autoSaveTimeout: NodeJS.Timeout | null = null;
+  useEffect(() => {
+    if (id) {
+      setFetching(true);
+      fetchBranchShariahById(id)
+        .then((result) => {
+          if (result) {
+            setFormData(result);
+          }
+        })
+        .catch((error) => console.error("Error fetching activity:", error))
+        .finally(() => setFetching(false));
+    } else {
+      setFormData({} as EmployeeData);
+    }
+  }, [id, fetchBranchShariahById]);
 
-    // Fetch questions
-    const fetchQuestions = async () => {
-        setQuestionLoading(true);
-        try {
-            const questionQuery = query(
-                collection(db, "branches-review-points"),
-                orderBy("order")
-            );
-            const questionSnapshot = await getDocs(questionQuery);
+  let autoSaveTimeout: NodeJS.Timeout | null = null;
 
-            const questionList = questionSnapshot.docs.map((doc) => ({
-                ...doc.data(),
-                id: doc.id,
-            }));
+  // Fetch questions
+  const fetchQuestions = async () => {
+    setQuestionLoading(true);
+    try {
+      const questionQuery = query(
+        collection(db, "branches-review-points"),
+        orderBy("order")
+      );
+      const questionSnapshot = await getDocs(questionQuery);
 
-            setQuestions(questionList);
-        } catch (error) {
-            console.error("Error fetching questions: ", error);
-        } finally {
-            setQuestionLoading(false);
-        }
+      const questionList = questionSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+
+      setQuestions(questionList);
+    } catch (error) {
+      console.error("Error fetching questions: ", error);
+    } finally {
+      setQuestionLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
+
+  // Load draft from localStorage
+  useEffect(() => {
+    const fetchDraft = async () => {
+      const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
+      const drafts = existingDrafts ? JSON.parse(existingDrafts) : [];
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const draft = drafts.find((draft: any) => draft.id === uniqueId);
+      if (draft) {
+        setFormData(draft.formData);
+      }
     };
 
-    useEffect(() => {
-        fetchQuestions();
-    }, []);
+    fetchDraft();
+  }, [uniqueId]);
 
-    // Load draft from localStorage
-    useEffect(() => {
-        const fetchDraft = async () => {
-            const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
-            const drafts = existingDrafts ? JSON.parse(existingDrafts) : [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChange = (key: string, value: any) => {
+    const updatedForm = { ...formData, [key]: value };
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const draft = drafts.find((draft: any) => draft.id === uniqueId);
-            if (draft) {
-                setFormData(draft.formData);
-            }
+    if (key === "branchCode") {
+      const branch = branches.find((branch) => branch.branchCode === value);
+      if (branch) {
+        updatedForm.branchName = branch.branchName;
+        updatedForm.city = branch.city;
+        updatedForm.area = branch.area;
+        updatedForm.rgm = branch.rgmName;
+        updatedForm.region = branch.region;
+      }
+    }
+
+    setFormData(updatedForm);
+
+    // Clear any existing timeout to prevent multiple calls
+    if (autoSaveTimeout) {
+      clearTimeout(autoSaveTimeout);
+    }
+
+    // Set a new timeout to save after 2 seconds
+    autoSaveTimeout = setTimeout(() => {
+      autoSaveDraft(updatedForm);
+    }, 2000);
+  };
+
+  // Auto-save draft every few seconds
+  const autoSaveDraft = async (updatedForm: EmployeeData) => {
+    setSaving(true);
+    try {
+      const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const drafts: any[] = existingDrafts ? JSON.parse(existingDrafts) : [];
+
+      const draftIndex = drafts.findIndex((draft) => draft.id === uniqueId);
+      const currentTime = new Date().toISOString();
+
+      if (draftIndex !== -1) {
+        // Update existing draft
+        drafts[draftIndex] = {
+          id: uniqueId,
+          formData: updatedForm,
+          lastEditedOn: currentTime,
         };
+      } else {
+        // Add new draft
+        drafts.push({
+          id: uniqueId,
+          formData: updatedForm,
+          lastEditedOn: currentTime,
+        });
+      }
 
-        fetchDraft();
-    }, [uniqueId]);
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
+    } catch (error) {
+      console.error("Error during autosave:", error);
+    } finally {
+      setSaving(false);
+    }
+  };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleChange = (key: string, value: any) => {
-        const updatedForm = {...formData, [key]: value};
+  // Save final form to Firestore and remove draft
+  const handleSave = async () => {
+    let id;
+    try {
+      setLoading(true);
 
-        if (key === "branchCode") {
-            const branch = branches.find((branch) => branch.branchCode === value);
-            if (branch) {
-                updatedForm.branchName = branch.branchName;
-                updatedForm.city = branch.city;
-                updatedForm.area = branch.area;
-                updatedForm.rgm = branch.rgmName;
-                updatedForm.region = branch.region;
-            }
+      const updatedFormData = {
+        ...formData,
+        employeeId: user?.employeeId,
+        name: user?.username,
+      };
+
+      if (updatedFormData.visitDate) {
+        const enteredDate = new Date(updatedFormData.visitDate);
+        const enteredYear = enteredDate.getFullYear();
+        const today = new Date();
+      
+        if (enteredYear < 1000) {
+          addToast({
+            title: "Please enter a four-digit year!",
+          });
+          return;
         }
-
-        setFormData(updatedForm);
-
-        // Clear any existing timeout to prevent multiple calls
-        if (autoSaveTimeout) {
-            clearTimeout(autoSaveTimeout);
+      
+        if (enteredDate > today) {
+          addToast({
+            title: "Future dates are not allowed!",
+          });
+          return;
         }
-
-        // Set a new timeout to save after 2 seconds
-        autoSaveTimeout = setTimeout(() => {
-            autoSaveDraft(updatedForm);
-        }, 2000);
-    };
-
-    // Auto-save draft every few seconds
-    const autoSaveDraft = async (updatedForm: EmployeeData) => {
-        setSaving(true);
-        try {
-            const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const drafts: any[] = existingDrafts ? JSON.parse(existingDrafts) : [];
-
-            const draftIndex = drafts.findIndex((draft) => draft.id === uniqueId);
-            const currentTime = new Date().toISOString();
-
-            if (draftIndex !== -1) {
-                // Update existing draft
-                drafts[draftIndex] = {
-                    id: uniqueId,
-                    formData: updatedForm,
-                    lastEditedOn: currentTime,
-                };
-            } else {
-                // Add new draft
-                drafts.push({
-                    id: uniqueId,
-                    formData: updatedForm,
-                    lastEditedOn: currentTime,
-                });
-            }
-
-            localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
-        } catch (error) {
-            console.error("Error during autosave:", error);
-        } finally {
-            setSaving(false);
+      
+        if (enteredYear < 2025) {
+          addToast({
+            title: "The date must be in 2025 or later!",
+          });
+          return;
         }
-    };
+      }
+      
 
-    // Save final form to Firestore and remove draft
-    const handleSave = async () => {
-        let id;
-        try {
-            setLoading(true);
+      if (id) {
+        await setDoc(doc(db, "BranchReview", id), updatedFormData);
+      } else {
+        await addDoc(collection(db, "BranchReview"), updatedFormData);
+      }
 
-            const updatedFormData = {
-                ...formData,
-                employeeId: user?.employeeId,
-                name: user?.username,
-            }
+      const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (existingDrafts) {
+        const drafts = JSON.parse(existingDrafts).filter(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (draft: any) => draft.id !== uniqueId
+        );
+        localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
+      }
 
-            if (id) {
-                await setDoc(doc(db, "BranchReview", id), updatedFormData);
-            } else {
-                await addDoc(collection(db, "BranchReview"), updatedFormData);
-            }
+      router.push("/branch-review");
+    } catch (error) {
+      console.error("Error saving data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
-            if (existingDrafts) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const drafts = JSON.parse(existingDrafts).filter((draft: any) => draft.id !== uniqueId);
-                localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
-            }
+  return (
+    <Card className="max-w-lg mx-auto bg-default-50">
+      <CardHeader className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <ArrowLeft
+            className="w-7 h-7 cursor-pointer"
+            onClick={() => window.history.back()}
+          />
+          <h2 className="text-2xl font-semibold text-center">
+            Branch Shariah Form
+          </h2>
+        </div>
+        <p className={`text-secondary`}>{saving ? "Saving..." : ""}</p>
+      </CardHeader>
+      <Divider />
+      <CardBody>
+        {fetching ? ( // ✅ Show Skeleton Loader while fetching
+          <div className="space-y-4">
+            {Array.from({ length: 10 }).map((_, index) => (
+              <Skeleton key={index} className="h-10 w-full rounded-md" />
+            ))}
+            <Skeleton className="h-12 w-full rounded-md" />
+          </div>
+        ) : (
+          <form onSubmit={handleSave}>
+            <FormGenerator
+              fields={formFields}
+              onChange={handleChange}
+              values={formData}
+            />
+            <QuestionsList
+              questions={questions}
+              loading={questionLoading}
+              formData={formData}
+              handleChange={handleChange}
+              title={"Review Points"}
+              selection={"name"}
+            />
 
-            router.push("/branch-review");
-        } catch (error) {
-            console.error("Error saving data:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return (
-        <Card className="max-w-lg mx-auto bg-default-50">
-            <CardHeader className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <ArrowLeft className="w-7 h-7 cursor-pointer" onClick={() => window.history.back()}/>
-                    <h2 className="text-2xl font-semibold text-center">Branch Shariah Form</h2>
-                </div>
-                <p className={`text-secondary`}>
-                    {saving ? "Saving..." : ""}
-                </p>
-            </CardHeader>
-            <Divider/>
-            <CardBody>
-                <form>
-                    <FormGenerator fields={formFields} onChange={handleChange} values={formData}/>
-                    <QuestionsList questions={questions} loading={questionLoading} formData={formData}
-                                   handleChange={handleChange} title={"Review Points"}
-                                   selection={"name"}
-                    />
-
-                    <div className="flex gap-4 mt-4">
-
-                        <Button type="submit" className="w-full" variant="shadow" color="primary" isLoading={loading}
-                                onPress={handleSave}>
-                            Save
-                        </Button>
-                    </div>
-                </form>
-            </CardBody>
-        </Card>
-    );
+            <div className="flex gap-4 mt-4">
+              <Button
+                type="submit"
+                className="w-full"
+                variant="shadow"
+                color="primary"
+                isLoading={loading}
+              >
+                Save
+              </Button>
+            </div>
+          </form>
+        )}
+      </CardBody>
+    </Card>
+  );
 };
 
 export default Page;

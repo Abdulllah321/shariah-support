@@ -150,7 +150,7 @@ const CommonList: React.FC<CommonListProps> = ({
                             fullWidth
                             variant={'shadow'}
                             startContent={<PlusCircle />}
-                            onClick={action.onPress}
+                            onPress={action.onPress}
                             size={'lg'}
                         >
                             {action.label}
@@ -177,8 +177,8 @@ const CommonList: React.FC<CommonListProps> = ({
                     <ModalBody>Are you sure you want to delete this record?</ModalBody>
 
                     <ModalFooter>
-                        <Button variant="light" onClick={closeDeleteModal}>Cancel</Button>
-                        <Button color="danger" onClick={handleConfirmDelete}>Delete</Button>
+                        <Button variant="light" onPress={closeDeleteModal}>Cancel</Button>
+                        <Button color="danger" onPress={handleConfirmDelete}>Delete</Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

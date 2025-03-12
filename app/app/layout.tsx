@@ -28,11 +28,11 @@ export const metadata: Metadata = {
     openGraph: {
         title: "Shariah Support and Services",
         description: "Expert Shariah compliance support and services for your needs.",
-        url: "https://www.shariahsupportservices.com", // Replace with your actual URL
+        url: "https://www.faysal-sss.com", // Replace with your actual URL
         siteName: "Shariah Support and Services",
         images: [
             {
-                url: "https://www.shariahsupportservices.com/og-image.jpg", // Replace with your actual image URL
+                url: "https://www.faysal-sss.com/og-image.jpg", // Replace with your actual image URL
                 width: 1200,
                 height: 630,
                 alt: "Shariah Support and Services",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
         title: "Shariah Support and Services",
         description: "Expert Shariah compliance support and services for your needs.",
         creator: "@AbdullahSufyan", // Replace with your actual Twitter handle
-        images: ["https://www.shariahsupportservices.com/twitter-image.jpg"], // Replace with your actual image URL
+        images: ["https://www.faysal-sss.com/twitter-image.jpg"], // Replace with your actual image URL
     },
     robots: {
         index: true,

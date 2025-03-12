@@ -212,9 +212,9 @@ export const RecordProvider = ({children}: { children: React.ReactNode }) => {
                 fetchLeads,
 
                 fetchDailyActivityById: (id) => fetchById<dailyActivityType>("records", id),
-                fetchBranchShariahById: (id) => fetchById<branchShariahType>("branchShariah", id),
-                fetchStaffInterviewById: (id) => fetchById<staffInterviewType>("staffInterviews", id),
-                fetchLeadsById: (id) => fetchById<leadsType>("leads", id),
+                fetchBranchShariahById: (id) => fetchById<branchShariahType>("BranchReview", id),
+                fetchStaffInterviewById: (id) => fetchById<staffInterviewType>("StaffReview", id),
+                fetchLeadsById: (id) => fetchById<leadsType>("360Leads", id),
             }}
         >
             {children}

@@ -77,6 +77,7 @@ export default function DailyActivityReport() {
 
     const handleDeleteDraft = (id: string) => {
         try {
+            console.log(id)
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const updatedDrafts = drafts?.filter((draft: any) => draft.id !== id);
             setDrafts(updatedDrafts);

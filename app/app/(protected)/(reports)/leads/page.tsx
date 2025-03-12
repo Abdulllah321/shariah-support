@@ -107,7 +107,8 @@ export default function DailyActivityReport() {
                 confirmDelete={confirmDelete}
                 fetchRecords={fetchLeads}
                 renderItemContent={renderItemContent}
-                action="leads"
+                action="360-leads"
+                description="clientEmployerBusinessName"
                 noRecordsActions={
                     [
                         {
