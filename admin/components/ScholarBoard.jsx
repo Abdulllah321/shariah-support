@@ -4,21 +4,16 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   Award,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   Trophy,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import "swiper/css/free-mode";
-import { FreeMode, Navigation } from "swiper/modules";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import { Bar } from "react-chartjs-2";
 import { Combobox } from "./DropdownMenu";
 import { Skeleton } from "./ui/skeleton";
 import { Label } from "flowbite-react";
+
 
 const ScholarBoard = ({ dailyActivityRecords }) => {
   const [isShowMore, setIsShowMore] = useState(false);
@@ -48,17 +43,20 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
   }, []);
 
   useEffect(() => {
-    const activitiesQuery = query(collection(db, "activities"), orderBy("order", "asc"));
-  
+    const activitiesQuery = query(
+      collection(db, "activities"),
+      orderBy("order", "asc")
+    );
+
     const unsubscribe = onSnapshot(activitiesQuery, (snapshot) => {
       const activitiesData = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-  
+
       setActivities(activitiesData);
     });
-  
+
     return () => unsubscribe();
   }, []);
 
@@ -124,10 +122,9 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
     }
   });
   const topActivities = activities
-  .filter((act) => activityCount[act.name] !== undefined) // Sirf woh activities lo jo activityCount mein hain
-  .slice(0, isShowMore ? undefined : 3) // Pehlay 3 ya sab (isShowMore ke mutabiq)
-  .map((act) => `${act.name} (${activityCount[act.name]})`);
-
+    .filter((act) => activityCount[act.name] !== undefined) // Sirf woh activities lo jo activityCount mein hain
+    .slice(0, isShowMore ? undefined : 3) // Pehlay 3 ya sab (isShowMore ke mutabiq)
+    .map((act) => `${act.name} (${activityCount[act.name]})`);
 
   return (
     <div
@@ -142,7 +139,9 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
               : "max-h-[600px]"
           }`}
     >
-      <h1 className="text-2xl text-gray-800 font-bold mb-2" >Scholar Wise Performance</h1>
+      <h1 className="text-2xl text-gray-800 font-bold mb-2">
+        Scholar Wise Performance
+      </h1>
       {/* //Tabs */}
       <div className="border rounded-md w-full p-2">
         <div className="flex items-center justify-center px-4 bg-gray-100 text-gray-700  rounded-md w-full relative">
@@ -179,8 +178,8 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
       {/* Divider */}
       <div className="w-full h-0.5 bg-gray-200 dark:bg-gray-700/50 my-2" />
 
-      <div className="relative w-full mb-10 flex items-center justify-center gap-3">
-        <Label>Select Scholars: </Label>
+      <div className="relative w-full mb-2 flex items-center justify-center md:gap-3 gap-1 flex-col md:flex-row">
+        <Label className="mx-auto w-full">Select Scholars: </Label>
         <Combobox
           frameworks={scholars}
           value={selectedScholar}
@@ -194,7 +193,6 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
 
       {activeTab === "chart" ? (
         <>
-          <h2 className="text-xl font-semibold mb-4">{scholars.find((scholar) => scholar.employeeId === selectedScholar).name} Activity Distribution</h2>
           {chartData ? (
             <Bar
               data={chartData}
@@ -212,7 +210,7 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
                 scales: {
                   x: {
                     ticks: {
-                      autoSkip: true,
+                      autoSkip: false,
                       maxRotation: 90,
                       minRotation: 90,
                       callback: function (value) {
@@ -228,7 +226,7 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
                   },
                 },
               }}
-              className="h-[200px] max-h-[300px] w-full"
+              className="h-[300px] md:h-[400px] max-h-[400px]"
             />
           ) : (
             <div className="h-[300px] md:h-[400px] max-h-[400px] flex flex-col justify-between p-4">
@@ -262,13 +260,6 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
         </>
       ) : (
         <>
-          {/* Title */}
-          <h2 className="text-xl font-bold flex items-center gap-2 text-gray-800 dark:text-white">
-            {selectedScholar
-              ? `${scholars.find((scholar) => scholar.employeeId === selectedScholar).name} Activities Distribution`
-              : "Top Activities Leaderboard"}
-          </h2>
-
           {/* Loading State */}
 
           {loading ? (

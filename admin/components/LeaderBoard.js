@@ -227,7 +227,7 @@ const Page = () => {
       ) : Object.keys(groupedRecords).length === 0 ? (
         <p>No records found.</p>
       ) : (
-        <div className="mb-4 flex justify-center items-center gap-3">
+        <div className="relative w-full flex items-center justify-center md:gap-3 gap-1 flex-col md:flex-row">
           <Label>Activity:</Label>
           <Select onValueChange={setSelected} value={selected}>
             <SelectTrigger className="w-[250px]">
@@ -235,7 +235,7 @@ const Page = () => {
             </SelectTrigger>
             <SelectContent>
               {activities
-                .filter((act) => groupedRecords[act.name.trim()] !== undefined) // Sirf woh activities jo groupedRecords mein hain
+                .filter((act) => groupedRecords[act.name.trim()] !== undefined)
                 .map((act) => {
                   const activityType = act.name.trim();
                   return (
@@ -261,7 +261,7 @@ const Page = () => {
         groupedRecords[selected] && (
           <div className="mt-4 w-full">
             <h2 className="text-xl font-bold mb-4 text-center text-gray-800">
-              {selected} Activity Leaderboard
+              {selected}
             </h2>
             <div className="space-y-2">
               {Object.entries(groupedRecords[selected])

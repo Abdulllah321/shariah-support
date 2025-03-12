@@ -112,7 +112,10 @@ function AdminSidebar({ children }) {
     ],
     []
   );
-
+  useEffect(() => {
+    setIsMobileOpen(false); // Close mobile sidebar when route changes
+  }, [pathname]);
+  
   useEffect(() => {
     if (isOpen)
       if (pathname === "/") {

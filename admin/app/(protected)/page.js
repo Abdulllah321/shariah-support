@@ -90,41 +90,56 @@ const Dashboard = () => {
     }))
     .sort((a, b) => b.score - a.score);
 
-  const generateColors = (count) => {
-    return Array.from(
-      { length: count },
-      (_, i) => `hsl(${i * (360 / count)}, 70%, 50%)`
-    );
-  };
+  const predefinedColors = [
+    "#FF0000", "#FF5733", "#FFC300", "#DAF7A6", "#28A745",
+    "#007BFF", "#6F42C1", "#E83E8C", "#17A2B8", "#20C997",
+    "#FD7E14", "#6610F2", "#DC3545", "#6C757D", "#343A40"
+  ];
 
   const employeeScoreChart = {
-    labels: sortedEmployeeScores.map((emp) => emp.name),
+    labels: sortedEmployeeScores.map((emp) => {
+      const name = emp.name.length > 10 ? `${emp.name.substring(0, 10)}...` : emp.name;
+      return `(${emp.score}) ${name}`;
+    }),
     datasets: [
       {
         label: "Total Score by Employee",
         data: sortedEmployeeScores.map((emp) => emp.score),
-        backgroundColor: generateColors(sortedEmployeeScores.length),
+        backgroundColor: predefinedColors.slice(0, sortedEmployeeScores.length),
         borderColor: "#fff",
         borderWidth: 2,
       },
     ],
   };
-
+  
   const employeeScoreChartOptions = {
     responsive: true,
     plugins: {
       legend: {
-        position: "top",
+        position: "left",
+        labels: {
+          font: {
+            size: 12,
+          },
+          boxWidth: 15,
+          usePointStyle: true, // Makes legends more compact
+        },
       },
-      title: {
-        display: true,
-        text: "Employee Total Scores",
+      tooltip: {
+        callbacks: {
+          label: (tooltipItem) => {
+            const index = tooltipItem.dataIndex;
+            return `${sortedEmployeeScores[index].name}: ${sortedEmployeeScores[index].score}`;
+          },
+        },
       },
     },
   };
+  
+  
 
   return (
-    <div className="p-6">
+    <div className="p-6 h-max">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold">Daily Activity Dashboard</h1>
         <p className="text-gray-600">Track and analyze employee activities</p>
