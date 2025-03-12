@@ -1,11 +1,7 @@
 import { db } from "@/firebase";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  Award,
-  ChevronDown,
-  Trophy,
-} from "lucide-react";
+import { Award, ChevronDown, Trophy } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
@@ -13,7 +9,6 @@ import { Bar } from "react-chartjs-2";
 import { Combobox } from "./DropdownMenu";
 import { Skeleton } from "./ui/skeleton";
 import { Label } from "flowbite-react";
-
 
 const ScholarBoard = ({ dailyActivityRecords }) => {
   const [isShowMore, setIsShowMore] = useState(false);
@@ -124,7 +119,12 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
   const topActivities = activities
     .filter((act) => activityCount[act.name] !== undefined) // Sirf woh activities lo jo activityCount mein hain
     .slice(0, isShowMore ? undefined : 3) // Pehlay 3 ya sab (isShowMore ke mutabiq)
-    .map((act) => `${act.name} (${activityCount[act.name]})`);
+    .map((act) => {
+      return {
+        name: act.name,
+        count: activityCount[act.name],
+      };
+    });
 
   return (
     <div
@@ -277,9 +277,9 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
               <AnimatePresence>
                 {topActivities.map((activity, index) => {
                   const rankStyles = [
-                    "bg-yellow-200/60 border-yellow-400 text-yellow-700 shadow-yellow-400/40 dark:bg-yellow-500/30 dark:border-yellow-400 dark:text-yellow-200 dark:shadow-yellow-500/40",
-                    "bg-gray-200/60 border-gray-400 text-gray-700 shadow-gray-400/40 dark:bg-gray-500/30 dark:border-gray-400 dark:text-gray-200 dark:shadow-gray-500/40",
-                    "bg-orange-200/60 border-orange-400 text-orange-700 shadow-orange-400/40 dark:bg-orange-500/30 dark:border-orange-400 dark:text-orange-200 dark:shadow-orange-500/40",
+                    "bg-yellow-300 border-yellow-500 text-yellow-900 shadow-yellow-500/50 dark:bg-yellow-600/40 dark:border-yellow-500 dark:text-yellow-100 dark:shadow-yellow-600/40",
+                    "bg-blue-200 border-blue-500 text-blue-900 shadow-blue-500/50 dark:bg-blue-600/40 dark:border-blue-400 dark:text-blue-100 dark:shadow-blue-600/40",
+                    "bg-orange-300 border-orange-500 text-orange-900 shadow-orange-500/50 dark:bg-orange-600/40 dark:border-orange-500 dark:text-orange-100 dark:shadow-orange-600/40",
                   ];
 
                   return (
@@ -328,7 +328,12 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
                         )}
                       </div>
                       <span className="ml-5 whitespace-nowrap text-ellipsis line-clamp-1">
-                        {index + 1}. {activity}
+                        {index + 1}. {activity.name}
+                      </span>
+                      <span
+                        className={"absolute right-0 top-1/2 -translate-y-1/2 bg-gray-50 p-2 rounded-r-full h-full flex items-center justify-center"} 
+                      >
+                        ({activity.count})
                       </span>
                     </motion.div>
                   );
@@ -345,7 +350,7 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
           {filteredRecords.length > 33 && (
             <div className="w-full h-20 bg-gradient-to-t from-gray-300 dark:from-gray-600/50 rounded-b-md to-transparent z-20 absolute bottom-0">
               <div
-                className="flex items-center justify-center w-full h-24 bg-transparent"
+                className="flex items-center justify-center w-full h-24 bg-transparent cursor-pointer"
                 onClick={() => setIsShowMore(!isShowMore)}
               >
                 <p className="text-blue-500 underline">
