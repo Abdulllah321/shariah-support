@@ -18,7 +18,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Skeleton } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 
-const DRAFT_STORAGE_KEY = "cachedStaffReviews";
+export const DRAFT_STORAGE_KEY = "cachedStaffReviews";
 
 const Page = () => {
   const formFields = useDailyActivityFormFields();
@@ -35,6 +35,7 @@ const Page = () => {
   const [fetching, setFetching] = useState(false);
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+  const isDraft = searchParams.get("draft") === "true";
 
   useEffect(() => {
     if (id) {
@@ -81,16 +82,19 @@ const Page = () => {
       const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
       const drafts = existingDrafts ? JSON.parse(existingDrafts) : [];
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const draft = drafts.find((draft: any) => draft.id === uniqueId);
-      if (draft) {
-        setFormData(draft.formData);
+      if (isDraft) {
+        const draft: { id: string; formData: EmployeeData } | undefined =
+          drafts.find((draft: { id: string }) => draft.id === id);
+        console.log(draft);
+        if (draft) {
+          setFormData(draft.formData);
+        }
       }
     };
 
     fetchQuestions();
     fetchDraft();
-  }, [uniqueId]);
+  }, [isDraft, id]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (key: string, value: any) => {
@@ -121,6 +125,12 @@ const Page = () => {
 
       const draftIndex = drafts.findIndex((draft) => draft.id === uniqueId);
       const currentTime = new Date().toISOString();
+
+      updatedForm = {
+        ...updatedForm,
+        employeeId: user?.employeeId || "",
+        name: user?.username || "",
+      };
 
       if (draftIndex !== -1) {
         // Update existing draft
@@ -161,21 +171,21 @@ const Page = () => {
         const enteredDate = new Date(updatedFormData.visitDate);
         const enteredYear = enteredDate.getFullYear();
         const today = new Date();
-      
+
         if (enteredYear < 1000) {
           addToast({
             title: "Please enter a four-digit year!",
           });
           return;
         }
-      
+
         if (enteredDate > today) {
           addToast({
             title: "Future dates are not allowed!",
           });
           return;
         }
-      
+
         if (enteredYear < 2025) {
           addToast({
             title: "The date must be in 2025 or later!",
@@ -184,7 +194,9 @@ const Page = () => {
         }
       }
 
-      if (id) {
+      console.log(updatedFormData);
+
+      if (id && !isDraft) {
         await setDoc(doc(db, "StaffReview", id), updatedFormData);
       } else {
         await addDoc(collection(db, "StaffReview"), updatedFormData);
@@ -192,12 +204,22 @@ const Page = () => {
 
       // Remove draft after saving
       const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
-      if (existingDrafts) {
-        const drafts = JSON.parse(existingDrafts).filter(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (draft: any) => draft.id !== uniqueId
-        );
-        localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
+      if (isDraft) {
+        if (existingDrafts) {
+          const drafts = JSON.parse(existingDrafts).filter(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (draft: any) => draft.id !== id
+          );
+          localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
+        }
+      } else {
+        if (existingDrafts) {
+          const drafts = JSON.parse(existingDrafts).filter(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (draft: any) => draft.id !== id
+          );
+          localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
+        }
       }
 
       router.push("/staff-interview");
@@ -232,7 +254,12 @@ const Page = () => {
             <Skeleton className="h-12 w-full rounded-md" />
           </div>
         ) : (
-          <form onSubmit={handleSave}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSave();
+            }}
+          >
             <FormGenerator
               fields={formFields}
               onChange={handleChange}

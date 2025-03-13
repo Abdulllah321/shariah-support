@@ -27,6 +27,7 @@ interface CommonListProps {
     renderItemContent: (item: dailyActivityType | branchShariahTypes | staffInterviewTypes | leadsType) => React.ReactNode;
     description?: string;
     action: string;
+    draft?: boolean;
 }
 
 const CommonList: React.FC<CommonListProps> = ({
@@ -39,6 +40,7 @@ const CommonList: React.FC<CommonListProps> = ({
     renderItemContent,
     description = 'branchName',
     action,
+    draft = false,
 }) => {
     const router = useRouter();
     const [deleteModal, setDeleteModal] = useState(false);
@@ -92,12 +94,12 @@ const CommonList: React.FC<CommonListProps> = ({
                     {records.map((item, index) => (
                         <ListboxItem
                             key={item.id || index}
-                            onPress={() => router.push(`/detail/${item.id}?action=${action}`)}
+                            onPress={() => router.push(`/detail/${item.id}?action=${action}${draft ? '&draft=true' : ''}`)}
                             variant={'shadow'}
                             className={`w-full`}
                         >
                             <Card isPressable
-                                onPress={() => router.push(`/detail/${item.id}?action=${action}`)}
+                                onPress={() => router.push(`/detail/${item.id}?action=${action}${draft ? '&draft=true' : ''}`)}
                                 fullWidth
                                 className="p-3 rounded-md transition bg-transparent w-full hover:bg-gray-100 dark:hover:bg-gray-800"
                             >
@@ -109,7 +111,7 @@ const CommonList: React.FC<CommonListProps> = ({
                                     </div>
                                     <div className="flex space-x-2">
                                         <Button
-                                            onPress={() => router.push(`/forms/${action}?id=${item.id}`)}
+                                            onPress={() => router.push(`/forms/${action}?id=${item.id}${draft ? '&draft=true' : ''}`)}
                                             onTouchStart={(e) => e.stopPropagation()} // موبائل کے لیے ٹچ ایونٹ ہینڈل کریں
                                             isIconOnly
                                             radius="full"
@@ -164,7 +166,7 @@ const CommonList: React.FC<CommonListProps> = ({
                         variant={'light'}
                         className={`mt-4`}
                         startContent={<RefreshCcw size={16} className="mr-2" />}
-                        onClick={fetchRecords}
+                        onPress={fetchRecords}
                     >
                         Refresh
                     </Button>
