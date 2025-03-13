@@ -12,6 +12,7 @@ import { Card, CardHeader } from "@heroui/react";
 import { CardBody } from "@heroui/card";
 import { DRAFT_STORAGE_KEY } from "@/app/(protected)/forms/staff-interview/page";
 import { EmployeeData } from "@/types/staffInterviewTypes";
+import { DRAFT_BRANCH_STORAGE_KEY } from "@/app/(protected)/(reports)/branch-review/page";
 
 interface ReportDetailsProps {
   id: string;
@@ -63,7 +64,8 @@ const ReportDetails: React.FC<ReportDetailsProps> = ({ id }) => {
   useEffect(() => {
     if (isDraft) {
       const fetchDraft = async () => {
-        const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
+        const getStorageKey = action === "staff-interview" ? DRAFT_STORAGE_KEY : DRAFT_BRANCH_STORAGE_KEY;
+        const existingDrafts = localStorage.getItem(getStorageKey);
         const drafts = existingDrafts ? JSON.parse(existingDrafts) : [];
 
         if (isDraft) {

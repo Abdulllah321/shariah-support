@@ -35,6 +35,7 @@ const Page = () => {
   const [fetching, setFetching] = useState(false);
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+  const isDraft = searchParams.get("draft") === "true";
 
   useEffect(() => {
     if (id) {
@@ -87,15 +88,19 @@ const Page = () => {
       const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
       const drafts = existingDrafts ? JSON.parse(existingDrafts) : [];
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const draft = drafts.find((draft: any) => draft.id === uniqueId);
-      if (draft) {
-        setFormData(draft.formData);
+      if (isDraft) {
+        const draft: { id: string; formData: EmployeeData } | undefined =
+          drafts.find((draft: { id: string }) => draft.id === id);
+        console.log(draft);
+        if (draft) {
+          setFormData(draft.formData);
+        }
       }
     };
 
+    fetchQuestions();
     fetchDraft();
-  }, [uniqueId]);
+  }, [isDraft, id]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (key: string, value: any) => {
@@ -176,21 +181,21 @@ const Page = () => {
         const enteredDate = new Date(updatedFormData.visitDate);
         const enteredYear = enteredDate.getFullYear();
         const today = new Date();
-      
+
         if (enteredYear < 1000) {
           addToast({
             title: "Please enter a four-digit year!",
           });
           return;
         }
-      
+
         if (enteredDate > today) {
           addToast({
             title: "Future dates are not allowed!",
           });
           return;
         }
-      
+
         if (enteredYear < 2025) {
           addToast({
             title: "The date must be in 2025 or later!",
@@ -198,7 +203,6 @@ const Page = () => {
           return;
         }
       }
-      
 
       if (id) {
         await setDoc(doc(db, "BranchReview", id), updatedFormData);
@@ -247,7 +251,12 @@ const Page = () => {
             <Skeleton className="h-12 w-full rounded-md" />
           </div>
         ) : (
-          <form onSubmit={handleSave}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSave();
+            }}
+          >
             <FormGenerator
               fields={formFields}
               onChange={handleChange}

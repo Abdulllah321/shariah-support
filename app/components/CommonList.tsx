@@ -107,7 +107,7 @@ const CommonList: React.FC<CommonListProps> = ({
                                     <div>
                                         <p className="text-gray-900 dark:text-gray-100 text-left">{renderItemContent(item)}</p>
                                         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                                        <p className="text-gray-500 dark:text-gray-400 text-sm text-left">{(item as any)[description] ?? "N/A"}</p>
+                                        <p className="text-gray-500 dark:text-gray-400 text-sm text-left">{draft ? (item as any).formData[description] ?? "N/A" : (item as any)[description] ?? "N/A"}</p>
                                     </div>
                                     <div className="flex space-x-2">
                                         <Button
