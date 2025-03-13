@@ -20,7 +20,7 @@ import { getFormattedDate } from "@/constants";
 import ExportBottomSheet from "@/components/ExportBottomSheet";
 import { groupRecordsByMonth } from "@/components/getFornattedData";
 
-export const DRAFT_BRANCH_STORAGE_KEY = "cachedBranchShariahReviews";
+const DRAFT_BRANCH_STORAGE_KEY = "cachedBranchShariahReviews";
 
 export default function DailyActivityReport() {
   const { branchShariahRecords, branchShariahLoading, fetchBranchShariah } =

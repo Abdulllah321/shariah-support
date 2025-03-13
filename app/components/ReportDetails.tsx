@@ -10,13 +10,14 @@ import getStaffInterviewList from "./StaffInterviewList";
 import get360LeadsList from "./360LeadsList";
 import { Card, CardHeader } from "@heroui/react";
 import { CardBody } from "@heroui/card";
-import { DRAFT_STORAGE_KEY } from "@/app/(protected)/forms/staff-interview/page";
 import { EmployeeData } from "@/types/staffInterviewTypes";
-import { DRAFT_BRANCH_STORAGE_KEY } from "@/app/(protected)/(reports)/branch-review/page";
 
 interface ReportDetailsProps {
   id: string;
 }
+
+const DRAFT_BRANCH_STORAGE_KEY = "cachedBranchShariahReviews";
+const DRAFT_STORAGE_KEY = "cachedStaffReviews";
 
 interface DetailItemProps {
   label: string;

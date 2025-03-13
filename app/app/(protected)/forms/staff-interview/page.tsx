@@ -18,7 +18,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Skeleton } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 
-export const DRAFT_STORAGE_KEY = "cachedStaffReviews";
+const DRAFT_STORAGE_KEY = "cachedStaffReviews";
 
 const Page = () => {
   const formFields = useDailyActivityFormFields();
