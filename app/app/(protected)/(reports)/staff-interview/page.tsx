@@ -150,10 +150,10 @@ export default function DailyActivityReport() {
 
 
   const groupedRecords = groupRecordsByMonth(staffInterviewRecords);
-
   const sortedMonthKeys = Object.keys(groupedRecords).sort(
     (a, b) => new Date(`${b}-01`).getTime() - new Date(`${a}-01`).getTime()
   );
+  console.log(sortedMonthKeys)
 
   return (
     <ScrollShadow>
@@ -205,7 +205,7 @@ export default function DailyActivityReport() {
                 }}
               >
                 <CommonList
-                  records={staffInterviewRecords}
+                  records={groupedRecords[monthKey]}
                   confirmDelete={confirmDelete}
                   fetchRecords={fetchStaffInterview}
                   loading={staffInterviewLoading}

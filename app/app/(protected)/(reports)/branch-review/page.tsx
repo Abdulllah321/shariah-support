@@ -222,7 +222,7 @@ export default function DailyActivityReport() {
                 }}
               >
                 <CommonList
-                  records={branchShariahRecords}
+                  records={groupedRecords[monthKey]}
                   confirmDelete={confirmDelete}
                   fetchRecords={fetchBranchShariah}
                   loading={branchShariahLoading}
