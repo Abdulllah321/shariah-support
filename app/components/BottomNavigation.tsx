@@ -23,6 +23,8 @@ export default function BottomNavigation() {
         const currentRoute = routes.find(route => route.path === pathname);
         if (currentRoute) {
             setActiveTab(currentRoute.key);
+        } else {
+            setActiveTab('');
         }
     }, [pathname]);
 

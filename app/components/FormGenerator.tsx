@@ -61,6 +61,12 @@ const FormGenerator: React.FC<FormGeneratorProps> = ({
         ) {
           return null;
         }
+        if (
+          field.value === "branchResponse" &&
+          values.activity !== "Clients met indoor / outdoor"
+        ) {
+          return null;
+        }
 
         return (
           <div key={field.value} className="flex flex-col gap-1">

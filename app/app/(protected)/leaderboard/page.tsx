@@ -117,9 +117,18 @@ const Page = () => {
             if (!acc[activityType]) acc[activityType] = {};
             if (!acc[activityType][employeeName]) acc[activityType][employeeName] = 0;
 
-            acc[activityType][employeeName]++;
+            if (activityType === "Clients met indoor / outdoor") {
+                // Ensure 'participants' is converted to a number safely
+                const participants = Number(record.participants);
+                acc[activityType][employeeName] += isNaN(participants) ? 0 : participants;
+            } else {
+                // Default count for other activities
+                acc[activityType][employeeName]++;
+            }
+            
             return acc;
         }, {});
+
 
         setGroupedRecords(groupedData);
     };    
@@ -150,7 +159,6 @@ const Page = () => {
         document.addEventListener("mouseup", handleMouseUp);
     };
 
-    console.log(scholars)
 
     return (
         <div className="p-6">
@@ -163,7 +171,7 @@ const Page = () => {
                         value={selectedMonth}
                         onChange={(e) => setSelectedMonth(e.target.value)}
                     >
-                        <option value="overall">Overall</option>
+                        <option value="overall">All</option>
                         {availableMonths.map((month) => {
                             try {
                                 const formattedMonth = format(parseISO(`${month}-01`), "MMMM yyyy"); // Converts YYYY-MM to readable format

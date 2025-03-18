@@ -144,8 +144,16 @@ const Page = () => {
       if (!acc[activityType]) acc[activityType] = {};
       if (!acc[activityType][employeeName]) acc[activityType][employeeName] = 0;
 
-      acc[activityType][employeeName]++;
-      return acc;
+      if (activityType === "Clients met indoor / outdoor") {
+        // Ensure 'participants' is converted to a number safely
+        const participants = Number(record.participants);
+        acc[activityType][employeeName] += isNaN(participants)
+          ? 0
+          : participants;
+      } else {
+        // Default count for other activities
+        acc[activityType][employeeName]++;
+      }
     }, {});
 
     setGroupedRecords(groupedData);
