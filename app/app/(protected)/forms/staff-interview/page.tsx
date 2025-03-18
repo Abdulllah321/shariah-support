@@ -17,6 +17,7 @@ import { Button } from "@heroui/button";
 import { useAuth } from "@/context/AuthContext";
 import { Skeleton } from "@heroui/react";
 import { addToast } from "@heroui/toast";
+import ProgressBar from "@/components/ProgressBar";
 
 const DRAFT_STORAGE_KEY = "cachedStaffReviews";
 
@@ -34,7 +35,7 @@ const Page = () => {
   const { user } = useAuth();
   const [fetching, setFetching] = useState(false);
   const searchParams = useSearchParams();
-  const id = searchParams.get("id") ||uniqueId;
+  const id = searchParams.get("id") || uniqueId;
   const isDraft = searchParams.get("draft") === "true";
 
   useEffect(() => {
@@ -79,18 +80,19 @@ const Page = () => {
   // Load draft from localStorage
   useEffect(() => {
     const fetchDraft = () => {
-      const existingDrafts = JSON.parse(localStorage.getItem(DRAFT_STORAGE_KEY) || "[]");
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const existingDrafts = JSON.parse(
+        localStorage.getItem(DRAFT_STORAGE_KEY) || "[]"
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const draft = existingDrafts.find((draft: any) => draft.id === id);
       if (draft) {
         setFormData(draft.formData);
       }
     };
-  
+
     fetchQuestions();
     if (isDraft) fetchDraft();
   }, [id, isDraft]);
-  
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (key: string, value: any) => {
@@ -115,22 +117,34 @@ const Page = () => {
   const autoSaveDraft = (updatedForm: EmployeeData) => {
     setSaving(true);
     try {
-      const existingDrafts = JSON.parse(localStorage.getItem(DRAFT_STORAGE_KEY) || "[]");
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const draftIndex = existingDrafts.findIndex((draft: any) => draft.id === id);
-  
+      const existingDrafts = JSON.parse(
+        localStorage.getItem(DRAFT_STORAGE_KEY) || "[]"
+      );
+      const draftIndex = existingDrafts.findIndex(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (draft: any) => draft.id === id
+      );
+
       updatedForm = {
         ...updatedForm,
         employeeId: user?.employeeId || "",
         name: user?.username || "",
       };
-  
+
       if (draftIndex !== -1) {
-        existingDrafts[draftIndex] = { id, formData: updatedForm, lastEditedOn: new Date().toISOString() };
+        existingDrafts[draftIndex] = {
+          id,
+          formData: updatedForm,
+          lastEditedOn: new Date().toISOString(),
+        };
       } else {
-        existingDrafts.push({ id, formData: updatedForm, lastEditedOn: new Date().toISOString() });
+        existingDrafts.push({
+          id,
+          formData: updatedForm,
+          lastEditedOn: new Date().toISOString(),
+        });
       }
-  
+
       localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(existingDrafts));
     } catch (error) {
       console.error("Error during autosave:", error);
@@ -138,11 +152,9 @@ const Page = () => {
       setSaving(false);
     }
   };
-  
 
   // Save final form to Firestore and remove draft
   const handleSave = async () => {
-  
     try {
       setLoading(true);
       const updatedFormData = {
@@ -203,7 +215,7 @@ const Page = () => {
           localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
         }
       }
-      
+
       router.push("/staff-interview");
     } catch (error) {
       console.error("Error saving data:", error);
@@ -212,8 +224,25 @@ const Page = () => {
     }
   };
 
+  const calculateAverageScore = () => {
+    const answeredQuestions = questions.filter(
+      (q) => formData[q.question] !== undefined
+    );
+    if (answeredQuestions.length === 0) return 0;
+
+    const totalMarksObtained = answeredQuestions.reduce(
+      (sum, q) => sum + Number(formData[q.question] || 0),
+      0
+    );
+    const totalPossibleMarks = answeredQuestions.length * 5;
+
+    return ((totalMarksObtained / totalPossibleMarks) * 100).toFixed(2); // Returns percentage
+  };
+
   return (
     <Card className="max-w-lg mx-auto bg-default-50">
+      <ProgressBar score={calculateAverageScore() as number} />
+
       <CardHeader className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <ArrowLeft
