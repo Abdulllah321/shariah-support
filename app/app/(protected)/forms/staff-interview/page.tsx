@@ -34,7 +34,7 @@ const Page = () => {
   const { user } = useAuth();
   const [fetching, setFetching] = useState(false);
   const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  const id = searchParams.get("id") ||uniqueId;
   const isDraft = searchParams.get("draft") === "true";
 
   useEffect(() => {
@@ -78,23 +78,19 @@ const Page = () => {
 
   // Load draft from localStorage
   useEffect(() => {
-    const fetchDraft = async () => {
-      const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
-      const drafts = existingDrafts ? JSON.parse(existingDrafts) : [];
-
-      if (isDraft) {
-        const draft: { id: string; formData: EmployeeData } | undefined =
-          drafts.find((draft: { id: string }) => draft.id === id);
-        console.log(draft);
-        if (draft) {
-          setFormData(draft.formData);
-        }
+    const fetchDraft = () => {
+      const existingDrafts = JSON.parse(localStorage.getItem(DRAFT_STORAGE_KEY) || "[]");
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const draft = existingDrafts.find((draft: any) => draft.id === id);
+      if (draft) {
+        setFormData(draft.formData);
       }
     };
-
+  
     fetchQuestions();
-    fetchDraft();
-  }, [isDraft, id]);
+    if (isDraft) fetchDraft();
+  }, [id, isDraft]);
+  
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (key: string, value: any) => {
@@ -116,49 +112,37 @@ const Page = () => {
   };
 
   // Auto-save draft every few seconds
-  const autoSaveDraft = async (updatedForm: EmployeeData) => {
+  const autoSaveDraft = (updatedForm: EmployeeData) => {
     setSaving(true);
     try {
-      const existingDrafts = localStorage.getItem(DRAFT_STORAGE_KEY);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const drafts: any[] = existingDrafts ? JSON.parse(existingDrafts) : [];
-
-      const draftIndex = drafts.findIndex((draft) => draft.id === uniqueId);
-      const currentTime = new Date().toISOString();
-
+      const existingDrafts = JSON.parse(localStorage.getItem(DRAFT_STORAGE_KEY) || "[]");
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const draftIndex = existingDrafts.findIndex((draft: any) => draft.id === id);
+  
       updatedForm = {
         ...updatedForm,
         employeeId: user?.employeeId || "",
         name: user?.username || "",
       };
-
+  
       if (draftIndex !== -1) {
-        // Update existing draft
-        drafts[draftIndex] = {
-          id: uniqueId,
-          formData: updatedForm,
-          lastEditedOn: currentTime,
-        };
+        existingDrafts[draftIndex] = { id, formData: updatedForm, lastEditedOn: new Date().toISOString() };
       } else {
-        // Add new draft
-        drafts.push({
-          id: uniqueId,
-          formData: updatedForm,
-          lastEditedOn: currentTime,
-        });
+        existingDrafts.push({ id, formData: updatedForm, lastEditedOn: new Date().toISOString() });
       }
-
-      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
+  
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(existingDrafts));
     } catch (error) {
       console.error("Error during autosave:", error);
     } finally {
       setSaving(false);
     }
   };
+  
 
   // Save final form to Firestore and remove draft
   const handleSave = async () => {
-    let id;
+  
     try {
       setLoading(true);
       const updatedFormData = {
@@ -194,8 +178,6 @@ const Page = () => {
         }
       }
 
-      console.log(updatedFormData);
-
       if (id && !isDraft) {
         await setDoc(doc(db, "StaffReview", id), updatedFormData);
       } else {
@@ -221,7 +203,7 @@ const Page = () => {
           localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(drafts));
         }
       }
-
+      
       router.push("/staff-interview");
     } catch (error) {
       console.error("Error saving data:", error);
