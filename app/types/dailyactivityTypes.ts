@@ -16,7 +16,7 @@ export type dailyActivityType = {
     otherVenue: string;
     personMet: string;
     participants: string;
-    participant: string;
+    // participant: string;
     purpose: string;
     region: string;
     remarks: string;

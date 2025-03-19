@@ -1,3 +1,4 @@
+import { dailyActivityType } from "@/types/dailyactivityTypes";
 import {
     User,
     Calendar,
@@ -16,27 +17,6 @@ import {
     Flag,
 } from "lucide-react";
 
-type Record = {
-    name?: string;
-    date?: string;
-    duration?: string;
-    branchCode?: string;
-    branchName?: string;
-    personMet?: string;
-    designation?: string;
-    purpose?: string;
-    activity?: string;
-    distance?: string;
-    score?: string;
-    contact?: string;
-    otherVenue?: string;
-    city?: string;
-    area?: string;
-    rgm?: string;
-    region?: string;
-    branchResponse?: string;
-    remarks?: string;
-};
 
 const formatDate = (date?: string): string => {
     if (!date) return "N/A";
@@ -48,7 +28,7 @@ const formatDate = (date?: string): string => {
     });
 };
 
-const getDailyActivityList = (record: Record) => [
+const getDailyActivityList = (record: dailyActivityType) => [
     { label: "Sharia Scholar", value: record.name || "N/A", icon: <User /> },
     { label: "Date", value: formatDate(record.date), icon: <Calendar /> },
     {
@@ -63,7 +43,7 @@ const getDailyActivityList = (record: Record) => [
     { label: "Branch Name", value: record.branchName || "N/A", icon: <Landmark /> },
     { label: "Person Met", value: record.personMet || "N/A", icon: <User /> },
     { label: "Designation", value: record.designation || "N/A", icon: <IdCard /> },
-    { label: "No of Participants / Clients", value: record.purpose || "N/A", icon: <Users /> },
+    { label: "No of Participants / Clients", value: record.participants || "N/A", icon: <Users /> },
     { label: "Activity / Title", value: record.activity || "N/A", icon: <List /> },
     { label: "Distance (Local / Short / Long)", value: record.distance || "N/A", icon: <Compass /> },
     { label: "Score", value: record.score || "N/A", icon: <Star /> },

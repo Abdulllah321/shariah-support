@@ -106,7 +106,7 @@ const Page = () => {
       const updatedFormData = {
         ...formData,
         score,
-        participants: formData?.participant || 0,
+        participants: formData?.participants || 0,
         employeeId: user?.employeeId,
         name: user?.username,
       };
