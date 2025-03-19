@@ -44,9 +44,13 @@ const QuestionsList: React.FC<QuestionsListProps> = ({
           const contentToDisplay =
             selection === "question" ? question.question : question[selection];
 
+          // Decide whether to show Yes/No or a numbered scale
+          const isYesNo = ["Yes", "No"].includes(question[selection]);
+          const options = isYesNo ? ["Yes", "No"] : title === "Review Points" ? [1, 2, 3] : [1, 2, 3, 4, 5];
+
           return (
-            <Card key={question.id} className="p-6 border ">
-              <h3 className="font-semibold mb-6 text-lg ">
+            <Card key={question.id} className="p-6 border">
+              <h3 className="font-semibold mb-6 text-lg">
                 #{index + 1} {contentToDisplay}
               </h3>
               <RadioGroup
@@ -54,24 +58,26 @@ const QuestionsList: React.FC<QuestionsListProps> = ({
                 onValueChange={(value) =>
                   handleChange(question[selection], value)
                 }
-                className="flex items-center "
+                className="flex items-center"
                 classNames={{
                   wrapper: "flex justify-between flex-nowrap",
                 }}
                 orientation="horizontal"
                 color="secondary"
               >
-                {[1, 2, 3, 4, 5].map((num, idx) => (
-                  <div key={num} className="flex items-center ">
+                {options.map((option, idx) => (
+                  <div key={option} className="flex items-center">
                     {idx !== 0 && (
                       <Divider className="h-6 w-px bg-gray-500 mx-2"></Divider>
                     )}
-                    <Radio value={String(num)} classNames={
-                        {
-                            wrapper: "ml-1"
-                        }
-                    }>{num}</Radio>
-                    {/* Vertical divider except for the last radio */}
+                    <Radio
+                      value={String(option)}
+                      classNames={{
+                        wrapper: "ml-1",
+                      }}
+                    >
+                      {option}
+                    </Radio>
                   </div>
                 ))}
               </RadioGroup>
