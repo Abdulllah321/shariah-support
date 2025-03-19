@@ -2,13 +2,12 @@
 
 import { motion } from "framer-motion";
 import { Progress } from "@heroui/progress";
-import { Smile, Meh, Frown } from "lucide-react";
+import { Smile, Frown } from "lucide-react";
 import { JSX } from "react";
 
 const ProgressBar = ({ score }: { score: number }) => {
   const getStatus = (): { text: string; color: "success" | "warning" | "danger"; icon: JSX.Element } => {
     if (score >= 75) return { text: "Satisfied", color: "success", icon: <Smile className="w-6 h-6 text-success" /> };
-    // if (score >= 50) return { text: "Needs Improvement", color: "warning", icon: <Meh className="w-6 h-6 text-warning" /> };
     return { text: "Unsatisfied", color: "danger", icon: <Frown className="w-6 h-6 text-danger" /> };
   };
 
