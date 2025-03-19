@@ -45,8 +45,12 @@ const QuestionsList: React.FC<QuestionsListProps> = ({
             selection === "question" ? question.question : question[selection];
 
           // Decide whether to show Yes/No or a numbered scale
-          const isYesNo = ["Yes", "No"].includes(question[selection]);
-          const options = isYesNo ? ["Yes", "No"] : title === "Review Points" ? [1, 2, 3] : [1, 2, 3, 4, 5];
+          const isYesNo = question[selection].includes("Yes") || question[selection].includes("No");
+          const options = isYesNo
+            ? ["Yes", "No"]
+            : title === "Review Points"
+            ? [1, 2, 3]
+            : [1, 2, 3, 4, 5];
 
           return (
             <Card key={question.id} className="p-6 border">
