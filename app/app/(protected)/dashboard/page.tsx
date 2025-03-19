@@ -2,7 +2,14 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "@/lib/firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
 import { Bar, Doughnut } from "react-chartjs-2";
 import {
@@ -22,6 +29,7 @@ import dayjs from "dayjs";
 import StatCard from "@/components/StatCard";
 import { useTheme } from "@heroui/use-theme";
 import { AnimatePresence, motion } from "framer-motion";
+import { ActivityType } from "@/constants/DailyActivityForm";
 
 ChartJS.register(
   CategoryScale,
@@ -47,10 +55,32 @@ const Dashboard: React.FC = () => {
   const [monthlyCategoryMap, setMonthlyCategoryMap] = useState<
     Record<string, Record<string, number>>
   >({});
+  const [activities, setActivities] = useState<ActivityType[]>([]);
   const [dailyActivityRecords, setDailyActivityRecords] =
     useState<dailyActivityType[]>();
   const [isShowMore, setIsShowMore] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const activitiesQuery = query(
+      collection(db, "activities"),
+      orderBy("order", "asc")
+    );
+
+    const unsubscribe = onSnapshot(activitiesQuery, (snapshot) => {
+      const activitiesData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        name: doc.data().name,
+        outstationDayTrip: doc.data().outstationDayTrip,
+        outstationLongDistance: doc.data().outstationLongDistance,
+        local: doc.data().local,
+      }));
+
+      setActivities(activitiesData);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     if (!isShowMore && sectionRef.current) {
@@ -198,10 +228,15 @@ const Dashboard: React.FC = () => {
     }
   });
 
-  const topActivities = Object.entries(activityCount)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, isShowMore ? undefined : 3) // If isShowMore is true, don't slice
-    .map(([activity, count]) => `${activity} (${count})`);
+  const topActivities = activities
+    .filter((act) => activityCount[act.name] !== undefined) // Sirf woh activities lo jo activityCount mein hain
+    .slice(0, isShowMore ? undefined : 3) // Pehlay 3 ya sab (isShowMore ke mutabiq)
+    .map((act) => {
+      return {
+        name: act.name,
+        count: activityCount[act.name],
+      };
+    });
 
   return (
     <div className="min-h-screen p-4 md:p-6">
@@ -294,8 +329,15 @@ const Dashboard: React.FC = () => {
                     </div>
 
                     {/* Rank & Activity Name */}
-                    <span className="ml-5 whitespace-nowrap  text-ellipsis line-clamp-1">
-                      {index + 1}. {activity}
+                    <span className="ml-5 whitespace-nowrap text-ellipsis line-clamp-1">
+                      {index + 1}. {activity.name}
+                    </span>
+                    <span
+                      className={
+                        "absolute right-0 top-1/2 -translate-y-1/2 bg-foreground-50/50 p-2 rounded-r-full h-full flex items-center justify-center w-12"
+                      }
+                    >
+                      ({activity.count})
                     </span>
                   </motion.div>
                 );
