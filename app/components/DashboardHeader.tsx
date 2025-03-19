@@ -173,7 +173,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </Button>
           </div>
         </div>
-
         <Modal isOpen={visible} onClose={closeLogoutModal} placement="center">
           <ModalContent>
             <ModalHeader>Confirm Logout</ModalHeader>

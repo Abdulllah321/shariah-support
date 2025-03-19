@@ -45,7 +45,9 @@ const QuestionsList: React.FC<QuestionsListProps> = ({
             selection === "question" ? question.question : question[selection];
 
           // Decide whether to show Yes/No or a numbered scale
-          const isYesNo = question[selection].includes("Yes") || question[selection].includes("No");
+          const isYesNo =
+            question[selection].includes("Yes") ||
+            question[selection].includes("No");
           const options = isYesNo
             ? ["Yes", "No"]
             : title === "Review Points"
@@ -53,21 +55,19 @@ const QuestionsList: React.FC<QuestionsListProps> = ({
             : [1, 2, 3, 4, 5];
 
           return (
-            <Card key={question.id} className="p-6 border">
-              <h3 className="font-semibold mb-6 text-lg">
-                #{index + 1} {contentToDisplay}
-              </h3>
+            <Card key={question.id} className="p-6 border-t">
               <RadioGroup
                 value={formData[question[selection]] || ""}
                 onValueChange={(value) =>
                   handleChange(question[selection], value)
                 }
-                className="flex items-center"
+                className="flex items-start"
                 classNames={{
-                  wrapper: "flex justify-between flex-nowrap",
+                  wrapper: "flex justify-between flex-nowrap items-center mx-auto mt-3",
                 }}
                 orientation="horizontal"
                 color="secondary"
+                label={`#${index + 1} ${contentToDisplay}`}
               >
                 {options.map((option, idx) => (
                   <div key={option} className="flex items-center">

@@ -13,13 +13,16 @@ import {
 import { Checkbox } from "@heroui/checkbox";
 import * as XLSX from "xlsx";
 import { CustomRadio } from "@/components/CustomRadio";
-import { Download } from "lucide-react";
+import { Download, Search } from "lucide-react";
 import { dailyActivityType } from "@/types/dailyactivityTypes";
 import { EmployeeData as BranchTypes } from "@/types/branchShariahTypes";
 import { EmployeeData } from "@/types/staffInterviewTypes";
 import { leadsType } from "@/types/360LeadsTypes";
 import { getFormattedData } from "@/components/getFornattedData";
 import { Question } from "@/components/QuestionsList";
+import FloatingSearchbar from "./FloatingSearchbar";
+import { AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface ExportBottomSheetProps {
   dailyActivityRecords:
@@ -29,14 +32,17 @@ interface ExportBottomSheetProps {
     | leadsType[];
   questions?: Question[];
   action: string;
+  onSearch?: (query: string) => void;
 }
 
 const ExportBottomSheet: React.FC<ExportBottomSheetProps> = ({
   dailyActivityRecords,
   action,
   questions,
+  onSearch,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
   const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
 
@@ -179,18 +185,43 @@ const ExportBottomSheet: React.FC<ExportBottomSheetProps> = ({
         <h2 className={`text-2xl font-extrabold capitalize`}>
           {transformAction(action)} Report
         </h2>
-
-        <Button
-          onPress={() => setIsOpen(true)}
-          isIconOnly
-          color={"warning"}
-          radius={"full"}
-          variant={`faded`}
-          className="shadow-secondary"
-        >
-          <Download size={20} />
-        </Button>
+        <div className="flex gap-2">
+          <AnimatePresence mode="wait">
+            {!isSearchOpen && onSearch && (
+              <motion.div layoutId="searchbar">
+                <Button
+                  onPress={() => setIsSearchOpen(true)}
+                  isIconOnly
+                  radius={"full"}
+                  variant={`flat`}
+                  className="bg-primary-600 dark:bg-primary-300 ring-1 ring-offset-4 ring-offset-background text-white scale-[0.85]"
+                >
+                  <Search size={20} />
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <Button
+            onPress={() => setIsOpen(true)}
+            isIconOnly
+            color={"warning"}
+            radius={"full"}
+            variant={`faded`}
+            className="shadow-secondary"
+          >
+            <Download size={20} />
+          </Button>
+        </div>
       </div>
+      <AnimatePresence mode="wait">
+        {isSearchOpen && onSearch && (
+          <FloatingSearchbar
+            onCancel={() => setIsSearchOpen(false)}
+            onSearch={onSearch!}
+            searchOpen={isSearchOpen}
+          />
+        )}
+      </AnimatePresence>
       <Sheet isOpen={isOpen} onClose={() => setIsOpen(false)} rootId="root">
         <Sheet.Container className="border-t rounded-t-2xl shadow-lg">
           <Sheet.Header />

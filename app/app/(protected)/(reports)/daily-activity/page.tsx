@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { Divider } from "@heroui/divider";
 import { getFormattedDate } from "@/constants";
 import { Accordion, AccordionItem, Skeleton } from "@heroui/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ExportBottomSheet from "@/components/ExportBottomSheet";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,6 +35,7 @@ export default function DailyActivityReport() {
   const { dailyActivityRecords, dailyActivityLoading, fetchDailyActivity } =
     useRecord();
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchDailyActivity();
@@ -46,7 +47,23 @@ export default function DailyActivityReport() {
     fetchDailyActivity();
   };
 
-  // Render function for an individual record
+  // Handle Search Logic
+  const handleSearch = (query: string) => {
+    setSearchQuery(query.toLowerCase());
+  };
+
+  // Filter records based on search query
+  const filteredRecords = dailyActivityRecords.filter(
+    (record) =>
+      record.activity.toLowerCase().includes(searchQuery) ||
+      getFormattedDate(record.date).toLowerCase().includes(searchQuery)
+  );
+
+  // Group filtered records by month
+  const groupedRecords = groupRecordsByMonth(filteredRecords);
+  const sortedMonthKeys = Object.keys(groupedRecords).sort(
+    (a, b) => new Date(`${b}-01`).getTime() - new Date(`${a}-01`).getTime()
+  );
   const renderItemContent = (
     item:
       | dailyActivityType
@@ -71,18 +88,12 @@ export default function DailyActivityReport() {
     return <span className="text-gray-500">Unknown Record Type</span>;
   };
 
-  // Group records by month
-  const groupedRecords = groupRecordsByMonth(dailyActivityRecords);
-  // Sort month keys in descending order (latest first)
-  const sortedMonthKeys = Object.keys(groupedRecords).sort(
-    (a, b) => new Date(`${b}-01`).getTime() - new Date(`${a}-01`).getTime()
-  );
-
   return (
     <ScrollShadow>
       <ExportBottomSheet
         dailyActivityRecords={dailyActivityRecords}
         action={"daily-activity"}
+        onSearch={handleSearch}
       />
 
       <Divider />
