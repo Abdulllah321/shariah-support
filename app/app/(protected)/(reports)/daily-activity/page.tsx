@@ -13,7 +13,7 @@ import { leadsType } from "@/types/360LeadsTypes";
 import { useRouter } from "next/navigation";
 import { Divider } from "@heroui/divider";
 import { getFormattedDate } from "@/constants";
-import { Accordion, AccordionItem } from "@heroui/react";
+import { Accordion, AccordionItem, Skeleton } from "@heroui/react";
 import { useEffect } from "react";
 import ExportBottomSheet from "@/components/ExportBottomSheet";
 
@@ -119,7 +119,25 @@ export default function DailyActivityReport() {
             );
           })}
         </Accordion>
-      ) : null}
+      ) :   <div className="space-y-3 p-3 w-full">
+      {[...Array(15)].map((_, index) => (
+          <div
+              key={index}
+              className="p-3 rounded-md transition w-full bg-gray-100 dark:bg-gray-800 animate-pulse"
+          >
+              <div className="flex justify-between items-center w-full">
+                  <div>
+                      <Skeleton className="h-6 w-40 mb-2" />
+                      <Skeleton className="h-4 w-32" />
+                  </div>
+                  <div className="flex space-x-2">
+                      <div className="h-8 w-8 bg-gray-300 dark:bg-gray-700 rounded-full animate-pulse" />
+                      <div className="h-8 w-8 bg-gray-300 dark:bg-gray-700 rounded-full animate-pulse" />
+                  </div>
+              </div>
+          </div>
+      ))}
+  </div>}
     </ScrollShadow>
   );
 }
