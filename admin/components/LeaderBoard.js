@@ -22,7 +22,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select"; // Import ShadCN Select
+} from "./ui/select";
+import ReactSelect from "react-select";
 
 const Page = () => {
   const [groupedRecords, setGroupedRecords] = useState({});
@@ -34,6 +35,9 @@ const Page = () => {
   const [records, setRecords] = useState([]);
   const [scholars, setScholars] = useState({});
   const [activities, setActivities] = useState([]);
+  const [selectedArea, setSelectedArea] = useState("overall");
+  const [availableAreas, setAvailableAreas] = useState([]);
+
 
   useEffect(() => {
     const fetchScholars = async () => {
@@ -83,6 +87,24 @@ const Page = () => {
           ...doc.data(),
         }));
 
+        const uniqueAreas = [
+          ...new Set(
+            fetchedRecords
+              .map((record) => record.area?.trim()) // Trim whitespace & handle undefined
+              .filter((area) => area) // Remove empty or falsy values
+          ),
+        ];
+
+        // Grouping areas alphabetically
+        const groupedAreas = uniqueAreas.sort().reduce((acc, area) => {
+          const firstLetter = area.charAt(0).toUpperCase(); // Get first letter
+          if (!acc[firstLetter]) acc[firstLetter] = []; // Create array if not exists
+          acc[firstLetter].push(area);
+          return acc;
+        }, {});
+
+        setAvailableAreas(groupedAreas);
+
         setRecords(fetchedRecords);
       } catch (error) {
         console.error("Error fetching daily activity records:", error);
@@ -117,11 +139,12 @@ const Page = () => {
     if (records.length > 0) {
       filterRecords();
     }
-  }, [records, selectedMonth, selectedRegion]);
+  }, [records, selectedMonth, selectedRegion,selectedArea]);
 
   const filterRecords = () => {
     let filteredRecords = records;
 
+    // Filter by selected month
     if (selectedMonth !== "overall") {
       filteredRecords = filteredRecords.filter((record) => {
         if (!record.date) return false;
@@ -131,30 +154,40 @@ const Page = () => {
       });
     }
 
+    // Filter by selected region
     if (selectedRegion !== "overall") {
       filteredRecords = filteredRecords.filter(
         (record) => record.region === selectedRegion
       );
     }
 
+    // Filter by selected area
+    if (selectedArea !== "overall") {
+      filteredRecords = filteredRecords.filter(
+        (record) => record.area === selectedArea
+      );
+    }
+    // Group data by activity and employee
     const groupedData = filteredRecords.reduce((acc, record) => {
       if (!record || !record.activity) return acc; // Skip undefined records
-    
+
       const activityType = record.activity?.trim() || "Other Activity";
       const employeeName = record.employeeId?.trim() || "Unnamed";
-    
+
       if (!acc[activityType]) acc[activityType] = {};
       if (!acc[activityType][employeeName]) acc[activityType][employeeName] = 0;
-    
+
       if (activityType === "Clients met indoor / outdoor") {
         const participants = Number(record.participants);
-        acc[activityType][employeeName] += isNaN(participants) ? 0 : participants;
+        acc[activityType][employeeName] += isNaN(participants)
+          ? 0
+          : participants;
       } else {
         acc[activityType][employeeName]++;
       }
-    
+
       return acc;
-    }, {});    
+    }, {});
 
     setGroupedRecords(groupedData);
 
@@ -174,16 +207,16 @@ const Page = () => {
         Activity Wise Performance
       </h1>
 
-      <div className="mb-4 flex justify-around w-full">
+      <div className="mb-4 flex gap-2 overflow-x-auto md:overflow-visible whitespace-nowrap w-full px-2">
         {loading ? (
           <Skeleton className="h-10 w-32 rounded-lg" />
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1 min-w-[120px]">
             <Label>Month</Label>
             <select
               className="p-2 border rounded-lg"
               value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
+              onChange={(e) => setSelectedArea(e.target.value)}
             >
               <option value="overall">All</option>
               {availableMonths.map((month) => {
@@ -205,10 +238,11 @@ const Page = () => {
             </select>
           </div>
         )}
+
         {loading ? (
           <Skeleton className="h-10 w-32 rounded-lg" />
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1 min-w-[120px]">
             <Label>Region</Label>
             <select
               className="p-2 border rounded-lg"
@@ -224,7 +258,32 @@ const Page = () => {
             </select>
           </div>
         )}
+
+        {loading ? (
+          <Skeleton className="h-10 w-32 rounded-lg" />
+        ) : (
+          <div className="flex flex-col gap-1 min-w-[120px]">
+            <Label>Area</Label>
+            <select
+              className="p-2 border rounded-lg"
+              value={selectedArea}
+              onChange={(e) => setSelectedArea(e.target.value)}
+            >
+              <option value="overall">All</option>
+              {Object.keys(availableAreas).map((letter) => (
+                <optgroup key={letter} label={letter}>
+                  {availableAreas[letter].map((area) => (
+                    <option key={area} value={area}>
+                      {area}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
+
       <hr />
       {loading ? (
         <div className="flex gap-4 overflow-x-auto p-2">
