@@ -46,8 +46,7 @@ const QuestionsList: React.FC<QuestionsListProps> = ({
 
           // Decide whether to show Yes/No or a numbered scale
           const isYesNo =
-            question[selection].includes("Yes") ||
-            question[selection].includes("No");
+            question[selection].includes("Yes / No");
           const options = isYesNo
             ? ["Yes", "No"]
             : title === "Review Points"
