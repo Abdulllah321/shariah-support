@@ -97,9 +97,9 @@ export default function DailyActivityReport() {
       />
 
       <Divider />
-
+    <div id="report-list">
       {sortedMonthKeys.length > 0 ? (
-        <Accordion selectionMode={"multiple"} defaultExpandedKeys={"all"}>
+        <Accordion selectionMode={"multiple"} defaultExpandedKeys={"all"} id="report-list">
           {sortedMonthKeys.map((monthKey) => {
             const dateObj = new Date(`${monthKey}-01`);
             const monthLabel = format(dateObj, "MMMM yyyy");
@@ -152,7 +152,7 @@ export default function DailyActivityReport() {
         </div>
       ) : (
         <p className="p-4 text-center">No records found.</p>
-      )}
+      )}</div>
     </ScrollShadow>
   );
 }

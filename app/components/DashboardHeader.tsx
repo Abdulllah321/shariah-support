@@ -84,7 +84,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       />
 
       <div className="backdrop-blur-xl bg-gradient-to-tr dark:from-foreground-800/20 dark:to-foreground-400/40 from-primary via-primary-800 to-primary-600 p-6 pt-20 -mt-20 rounded-b-3xl text-white relative overflow-hidden">
-        <div className="flex space-x-2 text-md text-center items-center font-semibold justify-between mb-4">
+        <div id="employee-id" className="flex space-x-2 text-md text-center items-center font-semibold justify-between mb-4">
           <span>Employee Id:</span>
           <span className="flex items-center gap-2">
             <span className={isEmpIdVisible ? "text-sm" : "text-lg"}>
@@ -108,7 +108,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
         <div className="flex flex-col items-start space-y-4 relative">
           <div className="flex items-center justify-between w-full">
-            <div className="leading-tight flex items-center space-x-3">
+            <div className="leading-tight flex items-center space-x-3"  id="employee-greeting">
               <div className="relative w-12 h-12">
                 {!imageLoaded && (
                   <Skeleton className="w-12 h-12 rounded-full" />
@@ -137,6 +137,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               onClick={openLogoutModal}
               className="bg-white text-red-500 rounded-full p-2"
               aria-label="Logout"
+              id="logout-button"
             >
               <LogOut className="w-6 h-6" />
             </button>
@@ -144,7 +145,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
           <Divider />
 
-          <div className="text-lg font-semibold text-gray-300 ">
+          <div className="text-lg font-semibold text-gray-300 " id="employee-score">
             Score: <AnimatedNumber value={Number(score)} />
           </div>
 
@@ -158,7 +159,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               size="md"
               startContent={<Eye className="w-4 h-4" />}
               onPress={handleScoreDetails}
-            >
+              id="view-details-btn"
+              >
               View Details
             </Button>
             <Button
@@ -168,6 +170,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               size="md"
               onPress={() => router.push("/dashboard")}
               endContent={<LayoutDashboard className="w-4 h-4" />}
+              id="view-dashboard-btn"
             >
               View Dashboard
             </Button>

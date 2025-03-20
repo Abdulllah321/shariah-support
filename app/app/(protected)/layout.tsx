@@ -7,6 +7,7 @@ import { Spinner } from "@heroui/spinner";
 import BottomNavigation from "@/components/BottomNavigation";
 import Navbar from "@/components/Navbar";
 import {RecordProvider} from "@/context/RecordContext";
+import WebsiteTour from "@/components/WebsiteTour";
 
 const ProtectedLayout = ({ children }: { children: ReactNode }) => {
     const { user, loading } = useAuth();
@@ -41,6 +42,7 @@ const ProtectedLayout = ({ children }: { children: ReactNode }) => {
             <Navbar />
             <main className={`py-20`}>
                 {children}
+                <WebsiteTour />
             </main>
             <BottomNavigation />
         </RecordProvider>

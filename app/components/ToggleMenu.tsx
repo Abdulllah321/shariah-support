@@ -33,7 +33,7 @@ export default function ToggleMenu({ user, handleLogout }: ToggleMenuProps) {
 
   return (
     <Dropdown>
-      <DropdownTrigger aria-label="Menu">
+      <DropdownTrigger aria-label="Menu" id={"dropdown-menu-button"}>
         <EllipsisVertical />
       </DropdownTrigger>
       <DropdownMenu

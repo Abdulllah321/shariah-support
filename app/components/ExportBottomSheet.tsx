@@ -188,7 +188,7 @@ const ExportBottomSheet: React.FC<ExportBottomSheetProps> = ({
         <div className="flex gap-2">
           <AnimatePresence mode="wait">
             {!isSearchOpen && onSearch && (
-              <motion.div layoutId="searchbar">
+              <motion.div layoutId="searchbar" id="search-button">
                 <Button
                   onPress={() => setIsSearchOpen(true)}
                   isIconOnly
@@ -208,6 +208,7 @@ const ExportBottomSheet: React.FC<ExportBottomSheetProps> = ({
             radius={"full"}
             variant={`faded`}
             className="shadow-secondary"
+            id="export-button"
           >
             <Download size={20} />
           </Button>

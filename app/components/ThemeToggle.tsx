@@ -21,6 +21,7 @@ export default function ThemeTabs() {
     return (
         <Tabs
             aria-label="Theme Switcher"
+            id="theme-switcher"
             selectedKey={theme}
             onSelectionChange={(key) => handleThemeChange(key as string)}
             variant="bordered"
