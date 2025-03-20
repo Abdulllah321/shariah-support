@@ -135,8 +135,14 @@ const driverObj = driver({
 
 const WebsiteTour = () => {
   useEffect(() => {
-    driverObj.drive();
+    const hasSeenTour = localStorage.getItem("hasSeenTour");
+
+    if (!hasSeenTour) {
+      driverObj.drive();
+      localStorage.setItem("hasSeenTour", "true");
+    }
   }, []);
+
   return null;
 };
 
