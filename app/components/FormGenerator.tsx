@@ -80,7 +80,6 @@ const FormGenerator: React.FC<FormGeneratorProps> = ({
                     const selectedOption = keyStr
                       .replace(/^options__/, "")
                       .replace(/-\d+$/, ""); // Extract the real option
-                    console.log(selectedOption);
                     onChange(field.value!, selectedOption);
                   }}
                   className="w-full"
@@ -105,12 +104,12 @@ const FormGenerator: React.FC<FormGeneratorProps> = ({
                     .filter((option) => option) // ✅ Remove falsy values
                     .map((option, index) => (
                       <AutocompleteItem
-                        key={`options__${option}-${index}`}
-                        value={`options__${option}-${index}`}
-                        textValue={option}
-                      >
-                        {option}
-                      </AutocompleteItem>
+                      key={`options__${option}-${index}`}
+                      id={`options__${option}-${index}`} // Use `id` instead of `value`
+                      textValue={option}
+                    >
+                      {option}
+                    </AutocompleteItem>                    
                     ))}
                 </Autocomplete>
               ) : (
@@ -124,7 +123,7 @@ const FormGenerator: React.FC<FormGeneratorProps> = ({
                   value={values[field.value!]}
                 >
                   {(field.options ?? []).map((option) => (
-                    <SelectItem key={option} value={option}>
+                    <SelectItem key={option} id={option}>
                       {option}
                     </SelectItem>
                   ))}
@@ -134,7 +133,6 @@ const FormGenerator: React.FC<FormGeneratorProps> = ({
               <DatePicker
                 isRequired={field.required}
                 label={field.label}
-                // @ts-expect-error:@typescript-eslint/ ban-ts-comment
                 value={
                   values[field.value!]
                     ? parseDate(values[field.value!].split("T")[0]) // Convert ISO to YYYY-MM-DD
