@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { RadioGroup, Radio, Spinner, Divider, Card } from "@heroui/react";
+import { RadioGroup, Radio, Spinner, Divider, Card, Textarea } from "@heroui/react";
 
 export interface Question {
   id: string;
@@ -44,25 +44,26 @@ const QuestionsList: React.FC<QuestionsListProps> = ({
           const contentToDisplay =
             selection === "question" ? question.question : question[selection];
 
-          // Decide whether to show Yes/No or a numbered scale
-          const isYesNo =
-            question[selection].includes("Yes / No");
-const isLast = currentIndex === questions.length - 1;
-        const options = isYesNo
-  ? ["Yes", "No"]
-  : title === "Review Points"
-  ? isLast
-    ? ["Yes", "No"]
-    : [1, 2, 3]
-  : [1, 2, 3, 4, 5];
+          // Check if the current question is the last one
+          const isLast = index === questions.length - 1;
+
+          // Determine if the question is Yes/No
+          const isYesNo = question[selection].includes("Yes / No");
+
+          // Define options based on conditions
+          const options = isYesNo
+            ? ["Yes", "No"]
+            : title === "Review Points"
+            ? isLast
+              ? ["Yes", "No"]
+              : [1, 2, 3]
+            : [1, 2, 3, 4, 5];
 
           return (
             <Card key={question.id} className="p-6 border-t">
               <RadioGroup
                 value={formData[question[selection]] || ""}
-                onValueChange={(value) =>
-                  handleChange(question[selection], value)
-                }
+                onValueChange={(value) => handleChange(question[selection], value)}
                 className="flex items-start"
                 classNames={{
                   wrapper: "flex justify-between flex-nowrap items-center mx-auto mt-3",
@@ -87,6 +88,16 @@ const isLast = currentIndex === questions.length - 1;
                   </div>
                 ))}
               </RadioGroup>
+
+              {/* Conditionally render Textarea if isLast and "Yes" is selected */}
+              {isLast && formData[question[selection]] === "Yes" && (
+                <Textarea
+                  placeholder="Please provide more details..."
+                  className="mt-4 w-full"
+                  value={formData["lastQuestionDetails"] || ""}
+                  onChange={(e) => handleChange("lastQuestionDetails", e.target.value)}
+                />
+              )}
             </Card>
           );
         })}
