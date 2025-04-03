@@ -94,8 +94,9 @@ const QuestionsList: React.FC<QuestionsListProps> = ({
                 <Textarea
                   placeholder="Please provide more details..."
                   className="mt-4 w-full"
-                  value={formData["lastQuestionDetails"] || ""}
-                  onChange={(e) => handleChange("lastQuestionDetails", e.target.value)}
+                  value={formData[selection] || ""}
+         
+                onValueChange={(value) => handleChange(question[selection], `Yes, ${value}`)}
                 />
               )}
             </Card>
