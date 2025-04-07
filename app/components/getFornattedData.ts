@@ -14,7 +14,7 @@ export const getFormattedData = (filteredData: any[], action: string, questions?
                 "Branch Name": record.branchName || "N/A",
                 "Person Met": record.personMet || "N/A",
                 Designation: record.designation || "N/A",
-                "No of Participants / Clients": record.purpose || "N/A",
+                "No of Participants / Clients": record.participants || "N/A",
                 "Activity / Title": record.activity || "N/A",
                 "Distance (Local / Short / Long)": record.distance || "N/A",
                 Score: record.score || "N/A",
