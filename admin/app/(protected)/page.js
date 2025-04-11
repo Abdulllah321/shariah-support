@@ -40,36 +40,53 @@ const Dashboard = () => {
     uniqueBranches: 0,
     uniqueEmployees: 0,
   });
+  const [uniqueStaffInterviews, setUniqueStaffInterviews] = useState(0);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "records"), (snapshot) => {
-      const fetchedActivities = snapshot.docs.map((doc) => doc.data());
-      setActivities(fetchedActivities);
+    const unsubscribeRecords = onSnapshot(
+      collection(db, "records"),
+      (snapshot) => {
+        const fetchedActivities = snapshot.docs.map((doc) => doc.data());
+        setActivities(fetchedActivities);
 
-      const totalActivities = fetchedActivities.length;
-      const totalScore = fetchedActivities.reduce((sum, act) => {
-        const score = Number(act.score);
-        return isNaN(score) ? sum : sum + score;
-      }, 0);
+        const totalActivities = fetchedActivities.length;
+        const totalScore = fetchedActivities.reduce((sum, act) => {
+          const score = Number(act.score);
+          return isNaN(score) ? sum : sum + score;
+        }, 0);
 
-      const uniqueBranches = new Set(
-        fetchedActivities.map((act) => act.branchCode)
-      ).size;
-      const uniqueEmployees = new Set(
-        fetchedActivities.map((act) => act.employeeId)
-      ).size;
+        const uniqueBranches = new Set(
+          fetchedActivities.map((act) => act.branchCode)
+        ).size;
+        const uniqueEmployees = new Set(
+          fetchedActivities.map((act) => act.employeeId)
+        ).size;
 
-      setSummary({
-        totalActivities,
-        avgScore: totalActivities
-          ? (totalScore / totalActivities).toFixed(2)
-          : 0,
-        uniqueBranches,
-        uniqueEmployees,
-      });
-    });
+        setSummary({
+          totalActivities,
+          avgScore: totalActivities
+            ? (totalScore / totalActivities).toFixed(2)
+            : 0,
+          uniqueBranches,
+          uniqueEmployees,
+        });
+      }
+    );
 
-    return () => unsubscribe();
+    const unsubscribeStaff = onSnapshot(
+      collection(db, "StaffReview"),
+      (snapshot) => {
+        const staffData = snapshot.docs.map((doc) => doc.data());
+        const uniqueStaff = new Set(staffData.map((s) => s.employeeName))
+          .size;
+        setUniqueStaffInterviews(uniqueStaff);
+      }
+    );
+
+    return () => {
+      unsubscribeRecords();
+      unsubscribeStaff();
+    };
   }, []);
 
   const employeeScores = activities.reduce((acc, act) => {
@@ -91,14 +108,27 @@ const Dashboard = () => {
     .sort((a, b) => b.score - a.score);
 
   const predefinedColors = [
-    "#FF0000", "#FF5733", "#FFC300", "#DAF7A6", "#28A745",
-    "#007BFF", "#6F42C1", "#E83E8C", "#17A2B8", "#20C997",
-    "#FD7E14", "#6610F2", "#DC3545", "#6C757D", "#343A40"
+    "#FF0000",
+    "#FF5733",
+    "#FFC300",
+    "#DAF7A6",
+    "#28A745",
+    "#007BFF",
+    "#6F42C1",
+    "#E83E8C",
+    "#17A2B8",
+    "#20C997",
+    "#FD7E14",
+    "#6610F2",
+    "#DC3545",
+    "#6C757D",
+    "#343A40",
   ];
 
   const employeeScoreChart = {
     labels: sortedEmployeeScores.map((emp) => {
-      const name = emp.name.length > 10 ? `${emp.name.substring(0, 10)}...` : emp.name;
+      const name =
+        emp.name.length > 10 ? `${emp.name.substring(0, 10)}...` : emp.name;
       return `(${emp.score}) ${name}`;
     }),
     datasets: [
@@ -111,7 +141,7 @@ const Dashboard = () => {
       },
     ],
   };
-  
+
   const employeeScoreChartOptions = {
     responsive: true,
     plugins: {
@@ -135,13 +165,11 @@ const Dashboard = () => {
       },
     },
   };
-  
-  
 
   return (
     <div className="p-6 h-max">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold">Daily Activity Dashboard</h1>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
         <p className="text-gray-600">Track and analyze employee activities</p>
       </div>
 
@@ -152,8 +180,8 @@ const Dashboard = () => {
         </motion.div>
 
         <motion.div className="bg-white p-6 rounded-lg shadow-lg text-center">
-          <h3 className="text-xl font-semibold">Avg. Score</h3>
-          <p className="text-3xl font-bold">{summary.avgScore}</p>
+          <h3 className="text-xl font-semibold">Interviewed Staff</h3>
+          <p className="text-3xl font-bold">{uniqueStaffInterviews}</p>
         </motion.div>
 
         <motion.div className="bg-white p-6 rounded-lg shadow-lg text-center">
