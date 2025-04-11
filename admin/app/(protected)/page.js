@@ -40,6 +40,7 @@ const Dashboard = () => {
     uniqueBranches: 0,
     uniqueEmployees: 0,
   });
+  const [totalStaffInterviews, setTotalStaffInterviews] = useState(0);
   const [uniqueStaffInterviews, setUniqueStaffInterviews] = useState(0);
 
   useEffect(() => {
@@ -77,8 +78,9 @@ const Dashboard = () => {
       collection(db, "StaffReview"),
       (snapshot) => {
         const staffData = snapshot.docs.map((doc) => doc.data());
-        const uniqueStaff = new Set(staffData.map((s) => s.employeeName))
-          .size;
+        const uniqueStaff = new Set(staffData.map((s) => s.employeeName)).size;
+        const totalStaff = staffData.length;
+        setTotalStaffInterviews(totalStaff);
         setUniqueStaffInterviews(uniqueStaff);
       }
     );
@@ -181,7 +183,9 @@ const Dashboard = () => {
 
         <motion.div className="bg-white p-6 rounded-lg shadow-lg text-center">
           <h3 className="text-xl font-semibold">Interviewed Staff</h3>
-          <p className="text-3xl font-bold">{uniqueStaffInterviews}</p>
+          <p className="text-3xl font-bold">
+            {uniqueStaffInterviews} / <sub>{totalStaffInterviews}</sub>
+          </p>
         </motion.div>
 
         <motion.div className="bg-white p-6 rounded-lg shadow-lg text-center">
