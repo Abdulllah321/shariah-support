@@ -11,7 +11,6 @@ import { User } from "@heroui/user";
 import { Divider } from "@heroui/react";
 import { EllipsisVertical } from "lucide-react";
 import { getMenuSections, MenuItem, MenuSection } from "@/constants/menuData";
-import Link from "next/link";
 
 export interface UserType {
   employeeId: string;
@@ -48,6 +47,7 @@ export default function ToggleMenu({ user, handleLogout }: ToggleMenuProps) {
             <Divider className="mt-3" />
           </div>
         }
+      
       >
         {menuSections.map(({ title, items }: MenuSection, index: number) => (
           <DropdownSection key={index} title={title!} showDivider={!!title}>
@@ -63,21 +63,20 @@ export default function ToggleMenu({ user, handleLogout }: ToggleMenuProps) {
                 const isActive = href ? pathname.startsWith(href) : false;
 
                 return (
-                  <Link href={href!} key={key}>
-                    <DropdownItem
-                      key={key}
-                      onPress={action}
-                      className={
-                        className ||
-                        (isActive
-                          ? "bg-primary shadow-foreground shadow-sm text-white"
-                          : "bg-transparent")
-                      }
-                      startContent={<Icon className="mr-2 h-4 w-4" />}
-                    >
-                      {label}
-                    </DropdownItem>
-                  </Link>
+                  <DropdownItem
+                    key={key}
+                    href={href}
+                    onPress={action}
+                    className={
+                      className ||
+                      (isActive
+                        ? "bg-primary shadow-foreground shadow-sm text-white"
+                        : "bg-transparent")
+                    }
+                    startContent={<Icon className="mr-2 h-4 w-4" />}
+                  >
+                    {label}
+                  </DropdownItem>
                 );
               }
             )}
