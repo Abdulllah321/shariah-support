@@ -10,11 +10,8 @@ import {
 import { db } from "@/firebase";
 import { Label } from "flowbite-react";
 import { format, parseISO } from "date-fns";
-import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/free-mode";
-import { FreeMode, Navigation } from "swiper/modules";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 import {
   Select,
@@ -23,7 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import ReactSelect from "react-select";
 
 const Page = () => {
   const [groupedRecords, setGroupedRecords] = useState({});

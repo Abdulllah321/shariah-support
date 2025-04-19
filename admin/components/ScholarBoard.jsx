@@ -110,9 +110,17 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
 
   // Count activities
   const activityCount = {};
+
   filteredRecords?.forEach((record) => {
-    const activity = record.activity;
-    if (activity) {
+    const activity = record.activity?.trim();
+    if (!activity) return;
+
+    if (activity === "Clients met indoor / outdoor") {
+      const participants = Number(record.participants);
+      activityCount[activity] =
+        (activityCount[activity] || 0) +
+        (isNaN(participants) ? 0 : participants);
+    } else {
       activityCount[activity] = (activityCount[activity] || 0) + 1;
     }
   });
@@ -331,7 +339,9 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
                         {index + 1}. {activity.name}
                       </span>
                       <span
-                        className={"absolute right-0 top-1/2 -translate-y-1/2 bg-gray-50 p-2 rounded-r-full h-full flex items-center justify-center w-12"} 
+                        className={
+                          "absolute right-0 top-1/2 -translate-y-1/2 bg-gray-50 p-2 rounded-r-full h-full flex items-center justify-center w-12"
+                        }
                       >
                         ({activity.count})
                       </span>
