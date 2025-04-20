@@ -50,17 +50,31 @@ const Dashboard = () => {
         const fetchedActivities = snapshot.docs.map((doc) => doc.data());
         setActivities(fetchedActivities);
 
-        const totalActivities = fetchedActivities.length;
-        const totalScore = fetchedActivities.reduce((sum, act) => {
+        // Define excluded activity types
+        const excludedActivities = [
+          "On Leave / Public Holiday",
+          "Office Day",
+          "Training Attended",
+        ];
+
+        // Filter out excluded activities
+        const validActivities = fetchedActivities.filter(
+          (act) => !excludedActivities.includes(act.activity?.trim())
+        );
+
+        const totalActivities = validActivities.length;
+
+        const totalScore = validActivities.reduce((sum, act) => {
           const score = Number(act.score);
           return isNaN(score) ? sum : sum + score;
         }, 0);
 
         const uniqueBranches = new Set(
-          fetchedActivities.map((act) => act.branchCode)
+          validActivities.map((act) => act.branchCode)
         ).size;
+
         const uniqueEmployees = new Set(
-          fetchedActivities.map((act) => act.employeeId)
+          validActivities.map((act) => act.employeeId)
         ).size;
 
         setSummary({

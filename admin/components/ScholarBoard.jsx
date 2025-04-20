@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Award, ChevronDown, Trophy } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import dayjs from "dayjs";
 import { Bar } from "react-chartjs-2";
 import { Combobox } from "./DropdownMenu";
 import { Skeleton } from "./ui/skeleton";
@@ -16,6 +15,8 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
   const [activities, setActivities] = useState([]);
   const [selectedScholar, setSelectedScholar] = useState(null);
   const [chartData, setChartData] = useState(null);
+  const [totalNoOfActivitiesPerScholar, setTotalNoOfActivitiesPerScholar] =
+    useState(0);
   const [activeTab, setActiveTab] = useState("list");
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -70,6 +71,12 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
         )
       : dailyActivityRecords;
 
+    const excludedActivities = [
+      "On Leave / Public Holiday",
+      "Office Day",
+      "Training Attended",
+    ];
+
     // Count activities
     filteredRecords?.forEach((record) => {
       const activity = record.activity;
@@ -79,12 +86,23 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
     });
 
     const categoryMap = {};
+    let totalCount = 0;
 
     filteredRecords.forEach((data) => {
-      const activityType = data.activity || "Other Activity";
-      const recordMonth = dayjs(data.date).format("YYYY-MM");
-      // Aggregate activity counts
-      categoryMap[activityType] = (categoryMap[activityType] || 0) + 1;
+      const activityType = data.activity?.trim() || "Other Activity";
+
+      if (!excludedActivities.includes(activityType)) {
+        // Handle special case
+        if (activityType === "Clients met indoor / outdoor") {
+          const count = Number(data.participants);
+          categoryMap[activityType] =
+            (categoryMap[activityType] || 0) + (isNaN(count) ? 0 : count);
+          totalCount++;
+        } else {
+          categoryMap[activityType] = (categoryMap[activityType] || 0) + 1;
+          totalCount++;
+        }
+      }
     });
 
     setChartData({
@@ -99,6 +117,7 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
       ],
     });
 
+    setTotalNoOfActivitiesPerScholar(totalCount);
     setLoading(false);
   }, [dailyActivityRecords, selectedScholar, scholars]);
 
@@ -186,17 +205,25 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
       {/* Divider */}
       <div className="w-full h-0.5 bg-gray-200 dark:bg-gray-700/50 my-2" />
 
-      <div className="relative w-full mb-2 flex items-center justify-center md:gap-3 gap-1 flex-col md:flex-row">
-        <Label className="mx-auto w-full">Select Scholars: </Label>
-        <Combobox
-          frameworks={scholars}
-          value={selectedScholar}
-          setValue={setSelectedScholar}
-          placeholder="Select Scholar..."
-          title="Scholars"
-          label="name"
-          mapValue="employeeId"
-        />
+      <div className="relative w-full mb-2 flex items-center justify-between md:gap-3 gap-1 flex-col md:flex-row">
+        <div className="flex flex-col gap-1">
+          <Label className="">Select Scholars </Label>
+          <Combobox
+            frameworks={scholars}
+            value={selectedScholar}
+            setValue={setSelectedScholar}
+            placeholder="Select Scholar..."
+            title="Scholars"
+            label="name"
+            mapValue="employeeId"
+          />
+        </div>
+        <div className="flex items-end">
+          <p>Total Activities: </p>
+          <p className="font-bold text-2xl text-gray-800 ">
+            {totalNoOfActivitiesPerScholar}
+          </p>
+        </div>
       </div>
 
       {activeTab === "chart" ? (
@@ -316,9 +343,7 @@ const ScholarBoard = ({ dailyActivityRecords }) => {
                       }}
                       onClick={() =>
                         router.push(
-                          `/reports/daily?scholar=${selectedScholar}&activity=${
-                            activity.split(" (")[0]
-                          }`
+                          `/reports/daily?scholar=${selectedScholar}&activity=${activity}`
                         )
                       }
                     >
