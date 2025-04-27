@@ -104,7 +104,6 @@ const Dashboard: React.FC = () => {
         const recordsSnapshot = await getDocs(recordsQuery);
 
         const categoryMap: Record<string, number> = {};
-        let totalScore = 0;
         const monthlyData: Record<string, Record<string, number>> = {};
         const uniqueMonths = new Set<string>();
         const activityFrequency: Record<string, number> = {};
@@ -122,7 +121,7 @@ const Dashboard: React.FC = () => {
           const recordMonth = dayjs(data.date).format("YYYY-MM");
           // Aggregate activity counts
           categoryMap[activityType] = (categoryMap[activityType] || 0) + 1;
-          totalScore += Number(data.score) || 0;
+          
 
           // Track per-month activity distribution
           if (!monthlyData[recordMonth]) {
@@ -138,7 +137,7 @@ const Dashboard: React.FC = () => {
             (activityFrequency[activityType] || 0) + 1;
         });
 
-        setTotalScores(totalScore);
+        setTotalScores(dailyActivity.length);
         setMonthlyCategoryMap(monthlyData);
 
         // Set available months dynamically
@@ -246,7 +245,7 @@ const Dashboard: React.FC = () => {
       <div className="grid gap-4 md:grid-cols-2">
         {/* Total Scores */}
         <StatCard
-          title="Total Scores"
+          title="Total Activities"
           value={totalScores}
           icon={Activity}
           loading={loading}

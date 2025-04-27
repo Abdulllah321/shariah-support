@@ -5,7 +5,8 @@ import "driver.js/dist/driver.css";
 const driverObj = driver({
   showProgress: true,
   showButtons: ["next", "previous"],
-  allowClose: false,
+  allowClose: true,
+  popoverClass: "driverjs-theme",
   doneBtnText: "Finish",
   nextBtnText: "Next ▶",
   prevBtnText: "⬅ Back",
@@ -75,8 +76,8 @@ const driverObj = driver({
     {
       element: "#employee-score",
       popover: {
-        title: "🏆 Your Score",
-        description: "Your current performance score is shown here.",
+        title: "🏆 Your Activities",
+        description: "Your current performance no of activities is shown here.",
         side: "top",
       },
     },

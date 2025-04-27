@@ -16,11 +16,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
     const { dailyActivityRecords } = useRecord();
 
-    // ✅ Calculate Total Score
-    const totalScore = dailyActivityRecords.reduce((sum, record) => {
-        const score = typeof record.score === "string" ? parseInt(record.score, 10) : record.score;
-        return sum + (isNaN(score) ? 0 : score);
-    }, 0);
+
 
 
 
@@ -31,7 +27,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
                 handleScoreDetails={handleScoreDetails}
                 empId={user?.employeeId}
                 username={user?.username}
-                score={totalScore}
+                score={dailyActivityRecords.length}
             />
             {children}
         </div>

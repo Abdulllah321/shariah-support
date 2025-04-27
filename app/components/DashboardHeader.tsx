@@ -146,7 +146,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <Divider />
 
           <div className="text-lg font-semibold text-gray-300 " id="employee-score">
-            Score: <AnimatedNumber value={Number(score)} />
+            Total Activities: <AnimatedNumber value={Number(score)} />
           </div>
 
           <Divider />
