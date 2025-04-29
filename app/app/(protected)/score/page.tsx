@@ -17,16 +17,18 @@ const RecordsList = () => {
     );
   }
 
-  const totalActivities = dailyActivityRecords.reduce((sum, record) => {
-    let participantCount = 1; // default
-    if (record.participants !== undefined && record.participants !== null) {
-      participantCount = parseInt(record.participants, 10);
-      if (isNaN(participantCount)) {
-        participantCount = 1; // fallback if parsing fails
-      }
-    }
-    return sum + participantCount;
-  }, 0);
+  const excludedActivities = [
+    "On Leave / Public Holiday",
+    "Office Day",
+    "Training Attended",
+  ];
+
+  // Filter out excluded activities
+  const validActivities = dailyActivityRecords.filter(
+    (act) => !excludedActivities.includes(act.activity?.trim())
+  );
+
+  const totalActivities = validActivities.length;
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
