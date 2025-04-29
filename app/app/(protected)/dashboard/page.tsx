@@ -42,7 +42,7 @@ ChartJS.register(
 );
 
 const Dashboard: React.FC = () => {
-  const [totalScores, setTotalScores] = useState(0);
+  const [totalActivities, setTotalActivities] = useState(0);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [chartData, setChartData] = useState<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -121,7 +121,6 @@ const Dashboard: React.FC = () => {
           const recordMonth = dayjs(data.date).format("YYYY-MM");
           // Aggregate activity counts
           categoryMap[activityType] = (categoryMap[activityType] || 0) + 1;
-          
 
           // Track per-month activity distribution
           if (!monthlyData[recordMonth]) {
@@ -137,7 +136,21 @@ const Dashboard: React.FC = () => {
             (activityFrequency[activityType] || 0) + 1;
         });
 
-        setTotalScores(dailyActivity.length);
+        // Define excluded activity types
+        const excludedActivities = [
+          "On Leave / Public Holiday",
+          "Office Day",
+          "Training Attended",
+        ];
+
+        // Filter out excluded activities
+        const validActivities = dailyActivity.filter(
+          (act) => !excludedActivities.includes(act.activity?.trim())
+        );
+
+        const totalActivities = validActivities.length;
+        setTotalActivities(totalActivities);
+
         setMonthlyCategoryMap(monthlyData);
 
         // Set available months dynamically
@@ -246,7 +259,7 @@ const Dashboard: React.FC = () => {
         {/* Total Scores */}
         <StatCard
           title="Total Activities"
-          value={totalScores}
+          value={totalActivities}
           icon={Activity}
           loading={loading}
           color="bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-400/50"
